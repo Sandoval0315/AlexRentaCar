@@ -1,0 +1,14 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import { getCollection } from 'astro:content';
+
+const collection = await getCollection('cars');
+---
+
+<MainLayout title="Catálogo - Alex Renta Cars">
+  <section class="hero">
+    <div class="container">
+      <h1>Catálogo de Vehículos</h1>
+      <p>Explore nuestro amplio catálogo de vehículos</p>
+    </div>
+  </section>

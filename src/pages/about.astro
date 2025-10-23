@@ -1,0 +1,14 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import { getCollection } from 'astro:content';
+
+const collection = await getCollection('cars');
+---
+
+<MainLayout title="About">
+  <section class="hero">
+    <div class="container">
+      <h1>About</h1>
+      <p>conoce mas de nosotros</p>
+    </div>
+  </section>

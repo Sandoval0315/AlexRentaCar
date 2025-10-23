@@ -1,0 +1,475 @@
+---
+// components/HeroGifSection.astro
+---
+
+<section class="hero-gif-section">
+  <!-- GIF de fondo -->
+  <div class="hero-gif-wrapper">
+    <img 
+      src="/videos/hero.gif"
+      alt="Lujo y elegancia en cada kilómetro - Alex Renta Cars"
+      class="hero-gif-fullscreen"
+      loading="eager"
+    />
+    <!-- Overlay para mejor legibilidad del texto -->
+    <div class="hero-overlay"></div>
+  </div>
+
+  <!-- Contenido de texto a la izquierda -->
+  <div class="hero-content">
+    <div class="hero-text">
+      <h1 class="hero-main-text">
+        Tu Viaje, Nuestra Prioridad
+      </h1>
+      
+      <p class="hero-sub-text">
+        Descubre nuestra flota de vehículos confiables y económicos. Desde prácticos compactos hasta espaciosas SUVs, 
+        te ofrecemos la mejor opción para moverte por El Salvador con seguridad y comodidad.
+      </p>
+
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-number">10+</span>
+          <span class="stat-label">Vehículos</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">24/7</span>
+          <span class="stat-label">Servicio</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">100%</span>
+          <span class="stat-label">Garantía</span>
+        </div>
+      </div>
+
+      <div class="hero-buttons">
+        <a href="/catalogo" class="btn btn-primary">
+          Ver Catálogo
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+        <a href="/contacto" class="btn btn-secondary">
+          Contactar
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Importar fuente Lexend */
+  @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap');
+
+  .hero-gif-section {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    min-height: 500px;
+    max-height: 800px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    font-family: 'Lexend', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    margin-top: 0;
+  }
+
+  .hero-gif-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .hero-gif-fullscreen {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+
+  .hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(0, 0, 0, 0.5) 60%,
+      rgba(0, 0, 0, 0.2) 100%
+    );
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    padding-top: 80px; /* Espacio para el navbar fijo */
+  }
+
+  .hero-text {
+    max-width: 550px;
+    color: white;
+    animation: fadeInUp 1s ease-out;
+  }
+
+  .hero-main-text {
+    font-family: 'Lexend', sans-serif;
+    font-size: clamp(2rem, 4.5vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin: 0 0 1.25rem 0;
+    letter-spacing: -0.01em;
+    color: #ffffff;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+  }
+
+  .hero-sub-text {
+    font-family: 'Lexend', sans-serif;
+    font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+    line-height: 1.5;
+    margin: 0 0 2rem 0;
+    color: #e5e7eb;
+    font-weight: 400;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+    max-width: 480px;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 1.5rem;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .stat-number {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 700;
+    color: #dc2626;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .stat-label {
+    font-size: clamp(0.75rem, 1.5vw, 0.85rem);
+    color: #d1d5db;
+    font-weight: 500;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .hero-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: clamp(0.75rem, 2vw, 1rem) clamp(1.25rem, 3vw, 2rem);
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: clamp(0.85rem, 1.8vw, 1rem);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid transparent;
+    font-family: 'Lexend', sans-serif;
+    white-space: nowrap;
+  }
+
+  .btn-primary {
+    background: #dc2626;
+    color: white;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  }
+
+  .btn-primary:hover {
+    background: #b91c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: white;
+    border-color: white;
+  }
+
+  .btn-secondary:hover {
+    background: white;
+    color: #1f2937;
+    transform: translateY(-2px);
+  }
+
+  /* Animaciones */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* === RESPONSIVE DESIGN MEJORADO === */
+
+  /* Tablets y laptops pequeñas */
+  @media (max-width: 1024px) {
+    .hero-gif-section {
+      height: 85vh;
+      min-height: 450px;
+      max-height: 700px;
+    }
+    
+    .hero-content {
+      padding: 0 1.5rem;
+      padding-top: 70px;
+    }
+    
+    .hero-text {
+      max-width: 500px;
+    }
+    
+    .hero-stats {
+      gap: 1.25rem;
+      margin: 1.75rem 0;
+    }
+  }
+
+  /* Tablets en vertical y móviles grandes */
+  @media (max-width: 768px) {
+    .hero-gif-section {
+      height: 75vh;
+      min-height: 400px;
+      max-height: 600px;
+      text-align: center;
+    }
+    
+    .hero-content {
+      padding: 0 1rem;
+      padding-top: 60px;
+      display: flex;
+      justify-content: center;
+    }
+    
+    .hero-text {
+      max-width: 100%;
+      text-align: center;
+    }
+    
+    .hero-main-text {
+      font-size: clamp(1.75rem, 6vw, 2.5rem);
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+    
+    .hero-sub-text {
+      font-size: clamp(0.85rem, 3.5vw, 1rem);
+      margin: 0 auto 1.5rem auto;
+      line-height: 1.4;
+      max-width: 400px;
+    }
+    
+    .hero-stats {
+      justify-content: center;
+      gap: 1.5rem;
+      margin: 1.5rem auto;
+      max-width: 300px;
+    }
+    
+    .stat-item {
+      align-items: center;
+      flex: 1;
+      min-width: 80px;
+    }
+    
+    .stat-number {
+      font-size: clamp(1.25rem, 4vw, 1.75rem);
+    }
+    
+    .stat-label {
+      font-size: clamp(0.7rem, 2.5vw, 0.8rem);
+      text-align: center;
+    }
+    
+    .hero-buttons {
+      justify-content: center;
+      gap: 0.75rem;
+    }
+    
+    .btn {
+      padding: 0.7rem 1.5rem;
+      font-size: 0.9rem;
+      flex: 1;
+      max-width: 160px;
+      justify-content: center;
+    }
+    
+    .hero-overlay {
+      background: linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.85) 0%,
+        rgba(0, 0, 0, 0.65) 100%
+      );
+    }
+  }
+
+  /* Móviles pequeños */
+  @media (max-width: 480px) {
+    .hero-gif-section {
+      height: 70vh;
+      min-height: 350px;
+      max-height: 500px;
+    }
+    
+    .hero-content {
+      padding: 0 0.75rem;
+      padding-top: 50px;
+    }
+    
+    .hero-main-text {
+      font-size: clamp(1.5rem, 7vw, 2rem);
+      margin-bottom: 0.875rem;
+    }
+    
+    .hero-sub-text {
+      font-size: clamp(0.8rem, 3.5vw, 0.9rem);
+      margin-bottom: 1.25rem;
+      max-width: 320px;
+    }
+    
+    .hero-stats {
+      gap: 1rem;
+      margin: 1.25rem auto;
+      max-width: 280px;
+    }
+    
+    .stat-item {
+      min-width: 70px;
+    }
+    
+    .stat-number {
+      font-size: clamp(1.1rem, 4vw, 1.5rem);
+    }
+    
+    .stat-label {
+      font-size: clamp(0.65rem, 2.5vw, 0.75rem);
+    }
+    
+    .hero-buttons {
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .btn {
+      width: 100%;
+      max-width: 200px;
+      padding: 0.75rem 1.25rem;
+      font-size: 0.85rem;
+    }
+    .btn-secondary {
+      margin-top: 10px;
+    }
+  }
+
+  /* Móviles muy pequeños */
+  @media (max-width: 360px) {
+    .hero-gif-section {
+      height: 65vh;
+      min-height: 300px;
+    }
+    
+    .hero-content {
+      padding: 0 0.5rem;
+      padding-top: 45px;
+    }
+    
+    .hero-stats {
+      gap: 0.75rem;
+      max-width: 250px;
+    }
+    
+    .stat-item {
+      min-width: 60px;
+    }
+    
+    .btn {
+      max-width: 180px;
+      padding: 0.65rem 1rem;
+    }
+  }
+
+  /* Ajustes para landscape en móviles */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .hero-gif-section {
+      height: 100vh;
+      min-height: 300px;
+    }
+    
+    .hero-content {
+      padding-top: 60px;
+    }
+    
+    .hero-text {
+      max-width: 90%;
+    }
+    
+    .hero-main-text {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .hero-sub-text {
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+      max-width: 400px;
+    }
+    
+    .hero-stats {
+      margin: 1rem 0;
+      gap: 1rem;
+    }
+    
+    .hero-buttons {
+      gap: 0.5rem;
+    }
+    
+    .btn {
+      padding: 0.5rem 1rem;
+      font-size: 0.8rem;
+    }
+  }
+
+  /* Optimización para dispositivos de alta densidad */
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .hero-gif-fullscreen {
+      image-rendering: auto;
+    }
+  }
+
+  /* Prevenir desbordamiento en todos los dispositivos */
+  .hero-gif-section * {
+    box-sizing: border-box;
+  }
+</style>

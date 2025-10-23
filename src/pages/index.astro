@@ -1,0 +1,218 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import HeroGifSection from '../components/HeroGifSection.astro';
+---
+
+<MainLayout title="Inicio - Alex Renta Cars">
+  <!-- Hero Section con GIF -->
+  <HeroGifSection />
+
+  <!-- Sección de características -->
+  <section class="features">
+    <div class="container">
+      <h2 class="text-center mb-4">¿Por qué elegir Alex Renta Cars?</h2>
+      <div class="grid grid-cols-3">
+        <div class="feature-card">
+          <div class="feature-icon">🚗</div>
+          <h3>Amplia Variedad</h3>
+          <p>Desde compactos económicos hasta SUVs de lujo para toda ocasión</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">💰</div>
+          <h3>Mejores Precios</h3>
+          <p>Tarifas competitivas sin cargos ocultos y las mejores promociones</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⭐</div>
+          <h3>Servicio Premium</h3>
+          <p>Atención personalizada 24/7 con soporte en toda El Salvador</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Call to Action -->
+  <section class="cta">
+    <div class="container text-center">
+      <h2>¿Listo para vivir la experiencia?</h2>
+      <p>Reserva ahora y disfruta de la mejor flota de vehículos en San Salvador</p>
+      <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+        <a href="/catalogo" class="btn btn-primary">Ver Catálogo Completo</a>
+        <a href="/contacto" class="btn btn-secondary">Solicitar Cotización</a>
+      </div>
+    </div>
+  </section>
+</MainLayout>
+
+<style>
+  /* Features Section */
+  .features {
+    padding: 5rem 0;
+    background: #f8fafc;
+  }
+
+  .features h2 {
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: #1f2937;
+    font-weight: 700;
+  }
+
+  .grid {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .feature-card {
+    text-align: center;
+    padding: 2.5rem 1.5rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 1px solid #e5e7eb;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  }
+
+  .feature-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .feature-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #dc2626;
+    font-weight: 600;
+  }
+
+  .feature-card p {
+    color: #6b7280;
+    line-height: 1.6;
+  }
+
+  /* CTA Section */
+  .cta {
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    padding: 5rem 0;
+    color: white;
+  }
+
+  .cta h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+  }
+
+  .cta p {
+    font-size: 1.25rem;
+    color: #d1d5db;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .text-center {
+    text-align: center;
+  }
+
+  .mb-4 {
+    margin-bottom: 2rem;
+  }
+
+  /* Botones globales */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    font-family: 'Lexend', sans-serif;
+  }
+
+  .btn-primary {
+    background: #dc2626;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: #b91c1c;
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: white;
+    border-color: white;
+  }
+
+  .btn-secondary:hover {
+    background: white;
+    color: #1f2937;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .grid-cols-3 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .features,
+    .cta {
+      padding: 3rem 0;
+    }
+
+    .features h2,
+    .cta h2 {
+      font-size: 2rem;
+    }
+
+    .grid-cols-3 {
+      grid-template-columns: 1fr;
+    }
+
+    .feature-card {
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      padding: 0 1rem;
+    }
+
+    .cta p {
+      font-size: 1.1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .features h2,
+    .cta h2 {
+      font-size: 1.75rem;
+    }
+
+    .btn {
+      padding: 0.875rem 1.5rem;
+      font-size: 0.95rem;
+    }
+  }
+</style>
