@@ -1,0 +1,220 @@
+---
+// components/ContactHeroSection.astro
+---
+
+<section class="contact-hero-section">
+  <!-- GIF de fondo -->
+  <div class="contact-hero-wrapper">
+    <img 
+      src="/videos/hero.gif"
+      alt="Contáctanos - Alex Renta Cars"
+      class="contact-hero-fullscreen"
+      loading="eager"
+    />
+    <!-- Overlay para mejor legibilidad del texto -->
+    <div class="contact-hero-overlay"></div>
+  </div>
+
+  <!-- Contenido de texto centrado -->
+  <div class="contact-hero-content">
+    <div class="contact-hero-text">
+      <h1 class="contact-hero-main-text">
+        Contáctanos
+      </h1>
+      
+      <p class="contact-hero-sub-text">
+        Estamos aquí para resolver tus dudas y brindarte el mejor servicio. 
+        Tu satisfacción es nuestra prioridad.
+      </p>
+
+      <div class="contact-hero-features">
+        <div class="contact-feature">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+          <span>Respuesta en 24 horas</span>
+        </div>
+        <div class="contact-feature">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+          <span>Soporte personalizado</span>
+        </div>
+        <div class="contact-feature">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+          <span>Asistencia 24/7</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Importar fuente Lexend */
+  @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap');
+
+  .contact-hero-section {
+    position: relative;
+    width: 100%;
+    height: 60vh;
+    min-height: 400px;
+    max-height: 600px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Lexend', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    margin-top: 0;
+  }
+
+  .contact-hero-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .contact-hero-fullscreen {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+
+  .contact-hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      135deg,
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(0, 0, 0, 0.6) 50%,
+      rgba(0, 0, 0, 0.4) 100%
+    );
+  }
+
+  .contact-hero-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    text-align: center;
+  }
+
+  .contact-hero-text {
+    max-width: 800px;
+    color: white;
+    animation: fadeInUp 1s ease-out;
+    margin: 0 auto;
+  }
+
+  .contact-hero-main-text {
+    font-family: 'Lexend', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin: 0 0 1.5rem 0;
+    letter-spacing: -0.01em;
+    color: #ffffff;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+  }
+
+  .contact-hero-sub-text {
+    font-family: 'Lexend', sans-serif;
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    line-height: 1.6;
+    margin: 0 auto 2.5rem auto;
+    color: #e5e7eb;
+    font-weight: 400;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+    max-width: 600px;
+  }
+
+  .contact-hero-features {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .contact-feature {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(220, 38, 38, 0.9);
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: white;
+  }
+
+  /* Animaciones */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .contact-hero-section {
+      height: 50vh;
+      min-height: 350px;
+      max-height: 500px;
+    }
+    
+    .contact-hero-content {
+      padding: 0 1rem;
+    }
+    
+    .contact-hero-main-text {
+      font-size: clamp(2rem, 6vw, 3rem);
+      margin-bottom: 1rem;
+    }
+    
+    .contact-hero-sub-text {
+      font-size: clamp(0.9rem, 3vw, 1.1rem);
+      margin-bottom: 2rem;
+    }
+    
+    .contact-hero-features {
+      gap: 1rem;
+    }
+    
+    .contact-feature {
+      padding: 0.5rem 1rem;
+      font-size: 0.8rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .contact-hero-section {
+      height: 55vh;
+      min-height: 350px;
+      max-height: 600px;
+    }
+    
+    .contact-hero-features {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+</style>

@@ -1,0 +1,880 @@
+---
+// pages/contacto.astro
+import MainLayout from '../layouts/MainLayout.astro';
+import ContactHeroSection from '../components/ContactHeroSection.astro';
+import GoogleMap from '../components/GoogleMap.astro';
+
+// Información de contacto
+const contactInfo = [
+  {
+    icon: "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
+    title: "Email",
+    details: ["info@alexrentacars.com", "soporte@alexrentacars.com"],
+    link: "mailto:info@alexrentacars.com"
+  },
+  {
+    icon: "M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z",
+    title: "Teléfono",
+    details: ["+503 2275-8900", "+503 7985-6321"],
+    link: "tel:+50322758900"
+  },
+  {
+    icon: "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z",
+    title: "Oficina Principal",
+    details: ["Centro Comercial Galerías", "San Salvador, El Salvador"],
+    link: "https://maps.google.com/?q=Centro+Comercial+Galerías,San+Salvador"
+  },
+  {
+    icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
+    title: "Horarios",
+    details: ["Lunes a Viernes: 7:00 AM - 8:00 PM", "Sábados: 8:00 AM - 6:00 PM", "Domingos: 9:00 AM - 2:00 PM"],
+    link: null
+  }
+];
+
+// Preguntas frecuentes
+const faqs = [
+  {
+    question: "¿Cuáles son los requisitos para rentar un vehículo?",
+    answer: "Necesitas tener licencia de conducir vigente, identificación oficial, ser mayor de 21 años y contar con una tarjeta de crédito para el depósito de garantía."
+  },
+  {
+    question: "¿Qué incluye el precio de la renta?",
+    answer: "El precio incluye seguro básico, kilometraje ilimitado, asistencia en carretera 24/7 y mantenimiento preventivo. No incluye gasolina ni peajes."
+  },
+  {
+    question: "¿Puedo modificar o cancelar mi reserva?",
+    answer: "Sí, puedes modificar o cancelar tu reserva sin costo hasta 24 horas antes de la fecha de recogida. Después de ese tiempo aplican cargos por cancelación."
+  },
+  {
+    question: "¿Ofrecen servicio de entrega y recogida?",
+    answer: "Sí, ofrecemos servicio de entrega y recogida en el aeropuerto y hoteles del área metropolitana de San Salvador sin costo adicional."
+  }
+];
+---
+
+<MainLayout title="Contáctanos - Alex Renta Cars">
+  <!-- Hero Section -->
+  <ContactHeroSection />
+
+  <!-- Sección de Contacto Principal -->
+  <section class="contact-main">
+    <div class="container">
+      <div class="contact-grid">
+        <!-- Información de Contacto -->
+        <div class="contact-info-sidebar">
+          <div class="sidebar-header">
+            <h2>Estamos aquí para ayudarte</h2>
+            <p>Contáctanos a través de cualquiera de estos medios</p>
+          </div>
+
+          <div class="contact-methods">
+            {contactInfo.map((item, index) => (
+              <div class="contact-method">
+                <div class="method-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d={item.icon}/>
+                  </svg>
+                </div>
+                <div class="method-content">
+                  <h3>{item.title}</h3>
+                  <div class="method-details">
+                    {item.details.map((detail, i) => (
+                      <span key={i}>{detail}</span>
+                    ))}
+                  </div>
+                  {item.link && (
+                    <a href={item.link} class="method-link">
+                      Contactar
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                      </svg>
+                    </a>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <!-- Redes Sociales -->
+          <div class="social-section">
+            <h3>Síguenos en redes sociales</h3>
+            <div class="social-links">
+              <a href="#" class="social-link" aria-label="Facebook">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+              </a>
+              <a href="#" class="social-link" aria-label="Instagram">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987s11.987-5.367 11.987-11.987C24.014 5.367 18.647.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.611-3.197-1.558-.749-.947-1.011-2.165-.703-3.415.308-1.25 1.167-2.289 2.343-2.792 1.175-.503 2.518-.412 3.614.246 1.096.658 1.819 1.822 1.945 3.104.126 1.282-.357 2.538-1.311 3.395-.954.857-2.256 1.22-3.491 1.02zm8.062 0c-.517 0-1.01-.104-1.465-.307-1.213-.56-2.038-1.784-2.038-3.182 0-.83.304-1.624.857-2.241.553-.617 1.312-.998 2.143-1.064.83-.066 1.645.189 2.297.703.652.514 1.073 1.249 1.173 2.055.1.806-.13 1.614-.637 2.247-.507.633-1.238 1.025-2.033 1.089-.133.011-.267.017-.401.017z"/>
+                </svg>
+              </a>
+              <a href="#" class="social-link" aria-label="WhatsApp">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893-.001-3.189-1.262-6.209-3.553-8.485"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Formulario de Contacto -->
+        <div class="contact-form-container">
+          <div class="form-header">
+            <h2>Envíanos un mensaje</h2>
+            <p>Completa el formulario y te contactaremos en menos de 24 horas</p>
+          </div>
+
+          <form id="contactForm" class="contact-form">
+            <div class="form-group">
+              <label for="name" class="form-label">Nombre Completo *</label>
+              <input 
+                type="text" 
+                id="name" 
+                name="name" 
+                class="form-input" 
+                required
+                placeholder="Tu nombre completo"
+              />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="email" class="form-label">Email *</label>
+                <input 
+                  type="email" 
+                  id="email" 
+                  name="email" 
+                  class="form-input" 
+                  required
+                  placeholder="tu.email@ejemplo.com"
+                />
+              </div>
+              <div class="form-group">
+                <label for="phone" class="form-label">Teléfono *</label>
+                <input 
+                  type="tel" 
+                  id="phone" 
+                  name="phone" 
+                  class="form-input" 
+                  required
+                  placeholder="+503 1234-5678"
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="subject" class="form-label">Asunto</label>
+              <select id="subject" name="subject" class="form-select">
+                <option value="">Selecciona un asunto</option>
+                <option value="renta">Consulta sobre Renta</option>
+                <option value="cotizacion">Solicitud de Cotización</option>
+                <option value="soporte">Soporte Técnico</option>
+                <option value="general">Consulta General</option>
+                <option value="sugerencia">Sugerencia o Reclamo</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="message" class="form-label">Mensaje *</label>
+              <textarea 
+                id="message" 
+                name="message" 
+                class="form-textarea" 
+                rows="6"
+                required
+                placeholder="Describe tu consulta o requerimiento..."
+              ></textarea>
+            </div>
+
+            <button type="submit" class="submit-button" id="submitButton">
+              <span class="button-text">Enviar Mensaje</span>
+              <span class="button-loading" style="display: none;">
+                <svg class="spinner" width="20" height="20" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="31.415, 31.415">
+                    <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/>
+                  </circle>
+                </svg>
+                Enviando...
+              </span>
+            </button>
+
+            <div id="formMessage" class="form-message" style="display: none;"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mapa -->
+  <section class="map-section">
+    <GoogleMap />
+  </section>
+
+  <!-- Preguntas Frecuentes -->
+  <section class="faq-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Preguntas Frecuentes</h2>
+        <p class="section-subtitle">
+          Respuestas a las dudas más comunes sobre nuestros servicios
+        </p>
+      </div>
+
+      <div class="faq-grid">
+        {faqs.map((faq, index) => (
+          <div class="faq-item">
+            <div class="faq-question">
+              <h3>{faq.question}</h3>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="faq-icon">
+                <path d="M7 10l5 5 5-5z"/>
+              </svg>
+            </div>
+            <div class="faq-answer">
+              <p>{faq.answer}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Call to Action Final -->
+  <section class="contact-cta">
+    <div class="container text-center">
+      <h2>¿Necesitas ayuda inmediata?</h2>
+      <p>Llámanos ahora y te atenderemos personalmente</p>
+      <div class="cta-phone">
+        <a href="tel:+50322758900" class="phone-link">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+          </svg>
+          +503 2275-8900
+        </a>
+      </div>
+      <p class="cta-note">Disponibles 24/7 para emergencias en carretera</p>
+    </div>
+  </section>
+</MainLayout>
+
+<style>
+  /* Estilos base */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .text-center {
+    text-align: center;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .section-title {
+    font-family: 'Lexend', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+  }
+
+  .section-subtitle {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1.1rem;
+    color: #6b7280;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* Sección de Contacto Principal */
+  .contact-main {
+    padding: 5rem 0;
+    background: #ffffff;
+  }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  /* Sidebar de Información */
+  .contact-info-sidebar {
+    background: #f8fafc;
+    padding: 2.5rem;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    height: fit-content;
+    position: sticky;
+    top: 2rem;
+  }
+
+  .sidebar-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .sidebar-header h2 {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+
+  .sidebar-header p {
+    font-family: 'Lexend', sans-serif;
+    color: #6b7280;
+    line-height: 1.5;
+  }
+
+  .contact-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .contact-method {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .method-icon {
+    color: #dc2626;
+    flex-shrink: 0;
+    margin-top: 0.25rem;
+  }
+
+  .method-content h3 {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+
+  .method-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .method-details span {
+    font-family: 'Lexend', sans-serif;
+    color: #6b7280;
+    font-size: 0.9rem;
+  }
+
+  .method-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.9rem;
+    color: #dc2626;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+
+  .method-link:hover {
+    color: #b91c1c;
+  }
+
+  /* Redes Sociales */
+  .social-section {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 2rem;
+  }
+
+  .social-section h3 {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 1rem;
+  }
+
+  .social-links {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: #dc2626;
+    color: white;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+  }
+
+  .social-link:hover {
+    background: #b91c1c;
+    transform: translateY(-2px);
+  }
+
+  /* Formulario */
+  .contact-form-container {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  .form-header {
+    margin-bottom: 2rem;
+  }
+
+  .form-header h2 {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-header p {
+    font-family: 'Lexend', sans-serif;
+    color: #6b7280;
+    line-height: 1.5;
+  }
+
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-label {
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #374151;
+  }
+
+  .form-input,
+  .form-select,
+  .form-textarea {
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.9rem;
+    color: #374151;
+    transition: all 0.3s ease;
+    background: white;
+  }
+
+  .form-input:focus,
+  .form-select:focus,
+  .form-textarea:focus {
+    outline: none;
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+  }
+
+  .form-textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .submit-button {
+    padding: 1rem 2rem;
+    background: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Lexend', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .submit-button:hover:not(:disabled) {
+    background: #b91c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  }
+
+  .submit-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .button-text,
+  .button-loading {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .spinner {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .form-message {
+    padding: 1rem;
+    border-radius: 8px;
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  .form-message--success {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+  }
+
+  .form-message--error {
+    background: #fecaca;
+    color: #dc2626;
+    border: 1px solid #fca5a5;
+  }
+
+  /* Mapa */
+  .map-section {
+    height: 400px;
+  }
+
+  /* FAQ Section */
+  .faq-section {
+    padding: 5rem 0;
+    background: #f8fafc;
+  }
+
+  .faq-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .faq-item {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .faq-item:hover {
+    border-color: #dc2626;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .faq-question {
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .faq-question h3 {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+  }
+
+  .faq-icon {
+    color: #dc2626;
+    transition: transform 0.3s ease;
+  }
+
+  .faq-answer {
+    padding: 0 1.5rem 1.5rem;
+    display: none;
+  }
+
+  .faq-answer p {
+    font-family: 'Lexend', sans-serif;
+    color: #6b7280;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .faq-item.active .faq-answer {
+    display: block;
+  }
+
+  .faq-item.active .faq-icon {
+    transform: rotate(180deg);
+  }
+
+  /* CTA Final */
+  .contact-cta {
+    padding: 4rem 0;
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    color: white;
+  }
+
+  .contact-cta h2 {
+    font-family: 'Lexend', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .contact-cta p {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 2rem;
+  }
+
+  .cta-phone {
+    margin-bottom: 1rem;
+  }
+
+  .phone-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: white;
+    color: #dc2626;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-family: 'Lexend', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    transition: all 0.3s ease;
+  }
+
+  .phone-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  }
+
+  .cta-note {
+    font-size: 1rem !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .contact-grid {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+
+    .contact-info-sidebar {
+      position: static;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .container {
+      padding: 0 1.5rem;
+    }
+
+    .section-title {
+      font-size: 2rem;
+    }
+
+    .contact-main {
+      padding: 3rem 0;
+    }
+
+    .contact-info-sidebar,
+    .contact-form-container {
+      padding: 2rem;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+
+    .faq-section {
+      padding: 3rem 0;
+    }
+
+    .contact-cta {
+      padding: 3rem 0;
+    }
+
+    .contact-cta h2 {
+      font-size: 2rem;
+    }
+
+    .phone-link {
+      font-size: 1.25rem;
+      padding: 0.875rem 1.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .container {
+      padding: 0 1rem;
+    }
+    .section-title {
+      font-size: 1.75rem;
+    }
+
+    .contact-info-sidebar,
+    .contact-form-container {
+      padding: 1.5rem;
+    }
+
+    .contact-method {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .social-links {
+      justify-content: center;
+    }
+
+    .phone-link {
+      font-size: 1.1rem;
+    }
+  }
+</style>
+
+<script>
+  // Configuración de EmailJS
+  const EMAILJS_CONFIG = {
+    SERVICE_ID: 'service_eergcby',
+    TEMPLATE_ID: 'template_wlb35go', 
+    PUBLIC_KEY: 'Haxeoh-WJZ1_lFwvQ'
+  };
+
+  // Función para cargar EmailJS
+  function loadEmailJS() {
+    return new Promise((resolve, reject) => {
+      if (window.emailjs) {
+        resolve(window.emailjs);
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+      script.onload = () => {
+        window.emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
+        resolve(window.emailjs);
+      };
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+
+  // Manejar FAQ
+  document.addEventListener('DOMContentLoaded', function() {
+    // FAQ functionality
+    const faqItems = document.querySelectorAll('.faq-item');
+    faqItems.forEach(item => {
+      const question = item.querySelector('.faq-question');
+      question.addEventListener('click', () => {
+        item.classList.toggle('active');
+      });
+    });
+
+    // Form submission
+    const contactForm = document.getElementById('contactForm');
+    
+    if (!contactForm) return;
+
+    contactForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const submitButton = document.getElementById('submitButton');
+      const buttonText = submitButton.querySelector('.button-text');
+      const buttonLoading = submitButton.querySelector('.button-loading');
+      const formMessage = document.getElementById('formMessage');
+      
+      // Mostrar loading
+      buttonText.style.display = 'none';
+      buttonLoading.style.display = 'flex';
+      submitButton.disabled = true;
+      formMessage.style.display = 'none';
+      
+      try {
+        // Cargar EmailJS
+        const emailjs = await loadEmailJS();
+        
+        const formData = {
+          name: document.getElementById('name').value,
+          email: document.getElementById('email').value,
+          phone: document.getElementById('phone').value,
+          subject: document.getElementById('subject').value,
+          message: document.getElementById('message').value,
+          from_page: window.location.href,
+          date: new Date().toLocaleString('es-SV')
+        };
+        
+        // Enviar el email
+        const result = await emailjs.send(
+          EMAILJS_CONFIG.SERVICE_ID,
+          EMAILJS_CONFIG.TEMPLATE_ID,
+          formData
+        );
+        
+        console.log('Email enviado:', result);
+        
+        // Éxito
+        formMessage.textContent = '¡Mensaje enviado correctamente! Te contactaremos pronto.';
+        formMessage.className = 'form-message form-message--success';
+        formMessage.style.display = 'block';
+        
+        // Reset form
+        contactForm.reset();
+        
+      } catch (error) {
+        console.error('Error al enviar el mensaje:', error);
+        
+        // Error
+        formMessage.textContent = 'Error al enviar el mensaje. Por favor, intenta nuevamente o contáctanos directamente.';
+        formMessage.className = 'form-message form-message--error';
+        formMessage.style.display = 'block';
+        
+      } finally {
+        // Restaurar botón
+        buttonText.style.display = 'flex';
+        buttonLoading.style.display = 'none';
+        submitButton.disabled = false;
+      }
+    });
+  });
+</script>
