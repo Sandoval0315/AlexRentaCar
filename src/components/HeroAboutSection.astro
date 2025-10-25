@@ -1,0 +1,403 @@
+---
+// components/HeroAboutSection.astro
+---
+
+<section class="hero-about-section">
+  <!-- GIF de fondo -->
+  <div class="hero-about-wrapper">
+    <img 
+      src="/videos/hero.gif"
+      alt="Alex Renta Cars - Acerca de Nosotros"
+      class="hero-about-fullscreen"
+      loading="eager"
+    />
+    <!-- Overlay para mejor legibilidad del texto -->
+    <div class="hero-about-overlay"></div>
+  </div>
+
+  <!-- Contenido de texto centrado -->
+  <div class="hero-about-content">
+    <div class="hero-about-text">
+      <h1 class="hero-about-main-text">
+        Acerca de Nosotros
+      </h1>
+      
+      <p class="hero-about-sub-text">
+        En Alex Renta Cars, llevamos más de 5 años siendo tu aliado confiable en movilidad. 
+        Nos enorgullece ofrecer un servicio excepcional y una flota de vehículos que se adapta a tus necesidades.
+      </p>
+
+      <div class="hero-about-stats">
+        <div class="about-stat-item">
+          <span class="about-stat-number">5+</span>
+          <span class="about-stat-label">Años de Experiencia</span>
+        </div>
+        <div class="about-stat-item">
+          <span class="about-stat-number">1000+</span>
+          <span class="about-stat-label">Clientes Satisfechos</span>
+        </div>
+        <div class="about-stat-item">
+          <span class="about-stat-number">50+</span>
+          <span class="about-stat-label">Vehículos</span>
+        </div>
+      </div>
+
+      <div class="hero-about-buttons">
+        <a href="/catalogo" class="btn btn-primary">
+          Ver Nuestra Flota
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+        <a href="/contacto" class="btn btn-secondary">
+          Contáctanos
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Importar fuente Lexend */
+  @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap');
+
+  .hero-about-section {
+    position: relative;
+    width: 100%;
+    height: 70vh;
+    min-height: 500px;
+    max-height: 700px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Lexend', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    margin-top: 0;
+  }
+
+  .hero-about-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .hero-about-fullscreen {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+
+  .hero-about-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      135deg,
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(0, 0, 0, 0.6) 50%,
+      rgba(0, 0, 0, 0.4) 100%
+    );
+  }
+
+  .hero-about-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    text-align: center;
+  }
+
+  .hero-about-text {
+    max-width: 800px;
+    color: white;
+    animation: fadeInUp 1s ease-out;
+    margin: 0 auto;
+  }
+
+  .hero-about-main-text {
+    font-family: 'Lexend', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 700;
+    line-height: 1.1;
+    margin: 0 0 1.5rem 0;
+    letter-spacing: -0.01em;
+    color: #ffffff;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+  }
+
+  .hero-about-sub-text {
+    font-family: 'Lexend', sans-serif;
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    line-height: 1.6;
+    margin: 0 auto 2.5rem auto;
+    color: #e5e7eb;
+    font-weight: 400;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+    max-width: 600px;
+  }
+
+  .hero-about-stats {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    margin: 2.5rem 0;
+    flex-wrap: wrap;
+  }
+
+  .about-stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .about-stat-number {
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    font-weight: 700;
+    color: #dc2626;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .about-stat-label {
+    font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+    color: #d1d5db;
+    font-weight: 500;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    text-align: center;
+  }
+
+  .hero-about-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: clamp(0.75rem, 2vw, 1rem) clamp(1.25rem, 3vw, 2rem);
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: clamp(0.85rem, 1.8vw, 1rem);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid transparent;
+    font-family: 'Lexend', sans-serif;
+    white-space: nowrap;
+  }
+
+  .btn-primary {
+    background: #dc2626;
+    color: white;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  }
+
+  .btn-primary:hover {
+    background: #b91c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: white;
+    border-color: white;
+  }
+
+  .btn-secondary:hover {
+    background: white;
+    color: #1f2937;
+    transform: translateY(-2px);
+  }
+
+  /* Animaciones */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* === RESPONSIVE DESIGN === */
+
+  /* Tablets y laptops pequeñas */
+  @media (max-width: 1024px) {
+    .hero-about-section {
+      height: 60vh;
+      min-height: 450px;
+      max-height: 600px;
+    }
+    
+    .hero-about-content {
+      padding: 0 1.5rem;
+    }
+    
+    .hero-about-stats {
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+  }
+
+  /* Tablets en vertical y móviles grandes */
+  @media (max-width: 768px) {
+    .hero-about-section {
+      height: 55vh;
+      min-height: 400px;
+      max-height: 500px;
+    }
+    
+    .hero-about-content {
+      padding: 0 1rem;
+    }
+    
+    .hero-about-main-text {
+      font-size: clamp(2rem, 6vw, 3rem);
+      margin-bottom: 1rem;
+    }
+    
+    .hero-about-sub-text {
+      font-size: clamp(0.9rem, 3vw, 1.1rem);
+      margin-bottom: 2rem;
+      max-width: 500px;
+    }
+    
+    .hero-about-stats {
+      gap: 1.5rem;
+      margin: 1.5rem auto;
+      max-width: 400px;
+    }
+    
+    .about-stat-item {
+      flex: 1;
+      min-width: 100px;
+    }
+    
+    .about-stat-number {
+      font-size: clamp(1.5rem, 4vw, 2rem);
+    }
+    
+    .about-stat-label {
+      font-size: clamp(0.75rem, 2.5vw, 0.85rem);
+    }
+    
+    .hero-about-buttons {
+      gap: 0.75rem;
+    }
+    
+    .btn {
+      padding: 0.7rem 1.5rem;
+      font-size: 0.9rem;
+      flex: 1;
+      max-width: 180px;
+      justify-content: center;
+    }
+  }
+
+  /* Móviles pequeños */
+  @media (max-width: 480px) {
+    .hero-about-section {
+      height: 50vh;
+      min-height: 350px;
+      max-height: 450px;
+    }
+    
+    .hero-about-content {
+      padding: 0 0.75rem;
+    }
+    
+    .hero-about-main-text {
+      font-size: clamp(1.75rem, 7vw, 2.5rem);
+      margin-bottom: 0.875rem;
+    }
+    
+    .hero-about-sub-text {
+      font-size: clamp(0.85rem, 3vw, 1rem);
+      margin-bottom: 1.5rem;
+      max-width: 320px;
+    }
+    
+    .hero-about-stats {
+      gap: 1rem;
+      margin: 1.25rem auto;
+      max-width: 300px;
+    }
+    
+    .about-stat-item {
+      min-width: 80px;
+    }
+    
+    .about-stat-number {
+      font-size: clamp(1.25rem, 4vw, 1.75rem);
+    }
+    
+    .about-stat-label {
+      font-size: clamp(0.7rem, 2.5vw, 0.8rem);
+    }
+    
+    .hero-about-buttons {
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .btn {
+      width: 100%;
+      max-width: 200px;
+      padding: 0.75rem 1.25rem;
+      font-size: 0.85rem;
+    }
+  }
+
+  /* Ajustes para landscape en móviles */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .hero-about-section {
+      height: 100vh;
+      min-height: 300px;
+    }
+    
+    .hero-about-main-text {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .hero-about-sub-text {
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+    
+    .hero-about-stats {
+      margin: 1rem 0;
+      gap: 1.5rem;
+    }
+    
+    .hero-about-buttons {
+      margin-top: 1rem;
+    }
+  }
+
+  /* Optimización para dispositivos de alta densidad */
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .hero-about-fullscreen {
+      image-rendering: auto;
+    }
+  }
+</style>
