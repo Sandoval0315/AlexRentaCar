@@ -1,0 +1,607 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+
+// Datos de ejemplo para un auto específico
+const car = {
+  _id: "1",
+  brand: "Toyota",
+  model: "Corolla",
+  year: 2023,
+  pricePerDay: 45,
+  category: "sedan",
+  transmission: "automatica",
+  seats: 5,
+  fuelType: "gasolina",
+  features: [
+    "Aire Acondicionado",
+    "Bluetooth",
+    "Cámara de Retroceso",
+    "Control de Crucero",
+    "Asistente de Carril",
+    "Sensores de Estacionamiento",
+    "Apple CarPlay",
+    "Android Auto"
+  ],
+  images: [
+    "/img/toyota-corolla-2023-1.jpg",
+    "/img/toyota_corolla_2023_2.jpeg",
+    "/img/Toyota-Corolla-2023-3.jpg"
+  ],
+  available: true,
+  description: "El Toyota Corolla 2023 combina eficiencia de combustible, confiabilidad y tecnología moderna en un sedán elegante. Perfecto para viajes de negocios o familiares, ofrece un manejo suave y características de seguridad avanzadas.",
+  licensePlate: "ABC123"
+};
+
+const { id } = Astro.params;
+---
+
+<MainLayout title={`${car.brand} ${car.model} - Alex Renta Cars`}>
+  <section class="car-detail">
+    <div class="car-detail__container">
+      <!-- Navegación -->
+      <nav class="car-detail__breadcrumb">
+        <a href="/catalogo" class="car-detail__breadcrumb-link">Catálogo</a>
+        <span class="car-detail__breadcrumb-separator">/</span>
+        <span class="car-detail__breadcrumb-current">{car.brand} {car.model}</span>
+      </nav>
+
+      <div class="car-detail__content">
+        <!-- Galería de Imágenes -->
+        <div class="car-detail__gallery">
+          <div class="car-detail__main-image">
+            <img 
+              src={car.images[0]} 
+              alt={`${car.brand} ${car.model}`}
+              class="car-detail__image"
+            />
+          </div>
+          <div class="car-detail__thumbnails">
+            {car.images.map((image, index) => (
+              <button class="car-detail__thumbnail">
+                <img 
+                  src={image} 
+                  alt={`${car.brand} ${car.model} - Vista ${index + 1}`}
+                  class="car-detail__thumbnail-image"
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <!-- Información del Auto -->
+        <div class="car-detail__info">
+          <div class="car-detail__header">
+            <h1 class="car-detail__title">{car.brand} {car.model}</h1>
+            <span class="car-detail__year">{car.year}</span>
+          </div>
+
+          <div class="car-detail__price">
+            <span class="car-detail__price-amount">${car.pricePerDay}</span>
+            <span class="car-detail__price-period">/ por día</span>
+          </div>
+
+          <div class="car-detail__status">
+            <span class={`car-detail__availability ${car.available ? 'car-detail__availability--available' : 'car-detail__availability--unavailable'}`}>
+              {car.available ? 'Disponible' : 'No Disponible'}
+            </span>
+          </div>
+
+          <p class="car-detail__description">{car.description}</p>
+
+          <!-- Especificaciones -->
+          <div class="car-detail__specs">
+            <h3 class="car-detail__specs-title">Especificaciones</h3>
+            <div class="car-detail__specs-grid">
+              <div class="car-detail__spec">
+                <span class="car-detail__spec-label">Categoría</span>
+                <span class="car-detail__spec-value">
+                  {car.category === 'sedan' ? 'Sedán' : 
+                   car.category === 'suv' ? 'SUV' : 
+                   car.category === 'compacto' ? 'Compacto' : 
+                   car.category === 'deportivo' ? 'Deportivo' : 
+                   car.category === 'van' ? 'Van' : 'Pickup'}
+                </span>
+              </div>
+              <div class="car-detail__spec">
+                <span class="car-detail__spec-label">Transmisión</span>
+                <span class="car-detail__spec-value">
+                  {car.transmission === 'automatica' ? 'Automática' : 'Manual'}
+                </span>
+              </div>
+              <div class="car-detail__spec">
+                <span class="car-detail__spec-label">Combustible</span>
+                <span class="car-detail__spec-value">
+                  {car.fuelType === 'gasolina' ? 'Gasolina' : 
+                   car.fuelType === 'diesel' ? 'Diésel' : 
+                   car.fuelType === 'electrico' ? 'Eléctrico' : 'Híbrido'}
+                </span>
+              </div>
+              <div class="car-detail__spec">
+                <span class="car-detail__spec-label">Asientos</span>
+                <span class="car-detail__spec-value">{car.seats} pasajeros</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Características -->
+          <div class="car-detail__features">
+            <h3 class="car-detail__features-title">Características</h3>
+            <div class="car-detail__features-grid">
+              {car.features.map((feature) => (
+                <div class="car-detail__feature">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                  </svg>
+                  <span>{feature}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <!-- Formulario de Reserva -->
+          <div class="car-detail__booking">
+            <h3 class="car-detail__booking-title">Reservar este vehículo</h3>
+            <form class="car-detail__booking-form">
+              <div class="car-detail__form-row">
+                <div class="car-detail__form-group">
+                  <label for="startDate" class="car-detail__form-label">Fecha de Inicio</label>
+                  <input 
+                    type="date" 
+                    id="startDate" 
+                    name="startDate" 
+                    class="car-detail__form-input"
+                    required
+                  />
+                </div>
+                <div class="car-detail__form-group">
+                  <label for="endDate" class="car-detail__form-label">Fecha de Fin</label>
+                  <input 
+                    type="date" 
+                    id="endDate" 
+                    name="endDate" 
+                    class="car-detail__form-input"
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div class="car-detail__form-group">
+                <label for="customerName" class="car-detail__form-label">Nombre Completo</label>
+                <input 
+                  type="text" 
+                  id="customerName" 
+                  name="customerName" 
+                  class="car-detail__form-input"
+                  required
+                />
+              </div>
+              
+              <div class="car-detail__form-row">
+                <div class="car-detail__form-group">
+                  <label for="customerEmail" class="car-detail__form-label">Email</label>
+                  <input 
+                    type="email" 
+                    id="customerEmail" 
+                    name="customerEmail" 
+                    class="car-detail__form-input"
+                    required
+                  />
+                </div>
+                <div class="car-detail__form-group">
+                  <label for="customerPhone" class="car-detail__form-label">Teléfono</label>
+                  <input 
+                    type="tel" 
+                    id="customerPhone" 
+                    name="customerPhone" 
+                    class="car-detail__form-input"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="car-detail__form-group">
+                <label for="notes" class="car-detail__form-label">Notas Adicionales (Opcional)</label>
+                <textarea 
+                  id="notes" 
+                  name="notes" 
+                  class="car-detail__form-textarea"
+                  rows="3"
+                  placeholder="Información adicional sobre tu reserva..."
+                ></textarea>
+              </div>
+
+              <button 
+                type="submit" 
+                class="car-detail__submit-button"
+                disabled={!car.available}
+              >
+                {car.available ? 'Reservar Ahora' : 'No Disponible'}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</MainLayout>
+
+<style>
+  .car-detail {
+    padding: 2rem 0 4rem;
+    background: #ffffff;
+  }
+
+  .car-detail__container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .car-detail__breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.9rem;
+    color: #6b7280;
+  }
+
+  .car-detail__breadcrumb-link {
+    color: #dc2626;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .car-detail__breadcrumb-link:hover {
+    color: #b91c1c;
+  }
+
+  .car-detail__breadcrumb-separator {
+    color: #d1d5db;
+  }
+
+  .car-detail__breadcrumb-current {
+    color: #374151;
+    font-weight: 500;
+  }
+
+  .car-detail__content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  .car-detail__gallery {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .car-detail__main-image {
+    border-radius: 12px;
+    overflow: hidden;
+    background: #f8fafc;
+  }
+
+  .car-detail__image {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+  }
+
+  .car-detail__thumbnails {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .car-detail__thumbnail {
+    flex: 1;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    background: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+  }
+
+  .car-detail__thumbnail:hover {
+    border-color: #dc2626;
+  }
+
+  .car-detail__thumbnail-image {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+  }
+
+  .car-detail__info {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .car-detail__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .car-detail__title {
+    font-family: 'Lexend', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+  }
+
+  .car-detail__year {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1rem;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 500;
+  }
+
+  .car-detail__price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .car-detail__price-amount {
+    font-family: 'Lexend', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #dc2626;
+  }
+
+  .car-detail__price-period {
+    font-size: 1rem;
+    color: #6b7280;
+  }
+
+  .car-detail__status {
+    margin-top: -1rem;
+  }
+
+  .car-detail__availability {
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+  }
+
+  .car-detail__availability--available {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .car-detail__availability--unavailable {
+    background: #fecaca;
+    color: #dc2626;
+  }
+
+  .car-detail__description {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #4b5563;
+    margin: 0;
+  }
+
+  .car-detail__specs,
+  .car-detail__features,
+  .car-detail__booking {
+    padding-top: 2rem;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .car-detail__specs-title,
+  .car-detail__features-title,
+  .car-detail__booking-title {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+  }
+
+  .car-detail__specs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .car-detail__spec {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .car-detail__spec-label {
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.9rem;
+    color: #6b7280;
+  }
+
+  .car-detail__spec-value {
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #374151;
+  }
+
+  .car-detail__features-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .car-detail__feature {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.9rem;
+    color: #374151;
+  }
+
+  .car-detail__feature svg {
+    color: #10b981;
+    flex-shrink: 0;
+  }
+
+  .car-detail__booking-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .car-detail__form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .car-detail__form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .car-detail__form-label {
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #374151;
+  }
+
+  .car-detail__form-input,
+  .car-detail__form-textarea {
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.9rem;
+    color: #374151;
+    transition: all 0.3s ease;
+  }
+
+  .car-detail__form-input:focus,
+  .car-detail__form-textarea:focus {
+    outline: none;
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+  }
+
+  .car-detail__form-textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  .car-detail__submit-button {
+    padding: 1rem 2rem;
+    background: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Lexend', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .car-detail__submit-button:hover:not(:disabled) {
+    background: #b91c1c;
+    transform: translateY(-2px);
+  }
+
+  .car-detail__submit-button:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .car-detail__content {
+      gap: 3rem;
+    }
+
+    .car-detail__features-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .car-detail {
+      padding: 1.5rem 0 3rem;
+    }
+
+    .car-detail__container {
+      padding: 0 1.5rem;
+    }
+
+    .car-detail__content {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+
+    .car-detail__title {
+      font-size: 1.75rem;
+    }
+
+    .car-detail__image {
+      height: 300px;
+    }
+
+    .car-detail__specs-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .car-detail__form-row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .car-detail__container {
+      padding: 0 1rem;
+    }
+
+    .car-detail__header {
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: flex-start;
+    }
+
+    .car-detail__year {
+      align-self: flex-start;
+    }
+
+    .car-detail__title {
+      font-size: 1.5rem;
+    }
+
+    .car-detail__price-amount {
+      font-size: 1.75rem;
+    }
+
+    .car-detail__thumbnails {
+      flex-wrap: wrap;
+    }
+
+    .car-detail__thumbnail {
+      flex: 0 0 calc(33.333% - 0.5rem);
+    }
+  }
+</style>

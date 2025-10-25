@@ -1,0 +1,297 @@
+---
+---
+
+<form id="contactForm" class="contact-form">
+  <div class="form-group">
+    <label for="name" class="form-label">Nombre Completo *</label>
+    <input 
+      type="text" 
+      id="name" 
+      name="name" 
+      class="form-input" 
+      required
+      placeholder="Tu nombre completo"
+    />
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="email" class="form-label">Email *</label>
+      <input 
+        type="email" 
+        id="email" 
+        name="email" 
+        class="form-input" 
+        required
+        placeholder="tu.email@ejemplo.com"
+      />
+    </div>
+    <div class="form-group">
+      <label for="phone" class="form-label">Teléfono *</label>
+      <input 
+        type="tel" 
+        id="phone" 
+        name="phone" 
+        class="form-input" 
+        required
+        placeholder="+503 1234-5678"
+      />
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="subject" class="form-label">Asunto</label>
+    <select id="subject" name="subject" class="form-select">
+      <option value="">Selecciona un asunto</option>
+      <option value="renta">Consulta sobre Renta</option>
+      <option value="cotizacion">Solicitud de Cotización</option>
+      <option value="soporte">Soporte Técnico</option>
+      <option value="general">Consulta General</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="message" class="form-label">Mensaje *</label>
+    <textarea 
+      id="message" 
+      name="message" 
+      class="form-textarea" 
+      rows="5"
+      required
+      placeholder="Describe tu consulta o requerimiento..."
+    ></textarea>
+  </div>
+
+  <button type="submit" class="submit-button" id="submitButton">
+    <span class="button-text">Enviar Mensaje</span>
+    <span class="button-loading" style="display: none;">
+      <svg class="spinner" width="20" height="20" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="31.415, 31.415">
+          <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+      Enviando...
+    </span>
+  </button>
+
+  <div id="formMessage" class="form-message" style="display: none;"></div>
+</form>
+
+<script>
+  // Configuración de EmailJS
+  const EMAILJS_CONFIG = {
+    SERVICE_ID: 'service_eergcby',
+    TEMPLATE_ID: 'template_wlb35go', 
+    PUBLIC_KEY: 'Haxeoh-WJZ1_lFwvQ'
+  };
+
+  // Función para cargar EmailJS
+  function loadEmailJS() {
+    return new Promise((resolve, reject) => {
+      if (window.emailjs) {
+        resolve(window.emailjs);
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+      script.onload = () => {
+        window.emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
+        resolve(window.emailjs);
+      };
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+
+  // Manejar el envío del formulario
+  document.addEventListener('DOMContentLoaded', function() {
+    const contactForm = document.getElementById('contactForm');
+    
+    if (!contactForm) return;
+
+    contactForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const submitButton = document.getElementById('submitButton');
+      const buttonText = submitButton.querySelector('.button-text');
+      const buttonLoading = submitButton.querySelector('.button-loading');
+      const formMessage = document.getElementById('formMessage');
+      
+      // Mostrar loading
+      buttonText.style.display = 'none';
+      buttonLoading.style.display = 'flex';
+      submitButton.disabled = true;
+      formMessage.style.display = 'none';
+      
+      try {
+        // Cargar EmailJS
+        const emailjs = await loadEmailJS();
+        
+        const formData = {
+          name: document.getElementById('name').value,
+          email: document.getElementById('email').value,
+          phone: document.getElementById('phone').value,
+          subject: document.getElementById('subject').value,
+          message: document.getElementById('message').value,
+          from_page: window.location.href,
+          date: new Date().toLocaleString('es-SV')
+        };
+        
+        // Enviar el email
+        const result = await emailjs.send(
+          EMAILJS_CONFIG.SERVICE_ID,
+          EMAILJS_CONFIG.TEMPLATE_ID,
+          formData
+        );
+        
+        console.log('Email enviado:', result);
+        
+        // Éxito
+        formMessage.textContent = '¡Mensaje enviado correctamente! Te contactaremos pronto.';
+        formMessage.className = 'form-message form-message--success';
+        formMessage.style.display = 'block';
+        
+        // Reset form
+        contactForm.reset();
+        
+      } catch (error) {
+        console.error('Error al enviar el mensaje:', error);
+        
+        // Error
+        formMessage.textContent = 'Error al enviar el mensaje. Por favor, intenta nuevamente o contáctanos directamente.';
+        formMessage.className = 'form-message form-message--error';
+        formMessage.style.display = 'block';
+        
+      } finally {
+        // Restaurar botón
+        buttonText.style.display = 'flex';
+        buttonLoading.style.display = 'none';
+        submitButton.disabled = false;
+      }
+    });
+  });
+</script>
+
+<style>
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-label {
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #374151;
+  }
+
+  .form-input,
+  .form-select,
+  .form-textarea {
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.9rem;
+    color: #374151;
+    transition: all 0.3s ease;
+    background: white;
+  }
+
+  .form-input:focus,
+  .form-select:focus,
+  .form-textarea:focus {
+    outline: none;
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+  }
+
+  .form-textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .submit-button {
+    padding: 1rem 2rem;
+    background: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Lexend', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .submit-button:hover:not(:disabled) {
+    background: #b91c1c;
+    transform: translateY(-2px);
+  }
+
+  .submit-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .button-text,
+  .button-loading {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .spinner {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .form-message {
+    padding: 1rem;
+    border-radius: 8px;
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  .form-message--success {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+  }
+
+  .form-message--error {
+    background: #fecaca;
+    color: #dc2626;
+    border: 1px solid #fca5a5;
+  }
+
+  @media (max-width: 768px) {
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

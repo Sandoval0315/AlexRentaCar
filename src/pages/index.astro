@@ -1,6 +1,59 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
 import HeroGifSection from '../components/HeroGifSection.astro';
+import ContactForm from '../components/ContactForm.astro';
+import GoogleMap from '../components/GoogleMap.astro';
+
+// Datos de autos populares
+const popularCars = [
+  {
+    _id: "1",
+    brand: "Toyota",
+    model: "Corolla",
+    year: 2023,
+    pricePerDay: 45,
+    category: "sedan",
+    transmission: "automatica",
+    seats: 5,
+    fuelType: "gasolina",
+    images: ["/img/toyota-corolla-2023-1.jpg"],
+    available: true
+  },
+  {
+    _id: "2",
+    brand: "Honda",
+    model: "CR-V",
+    year: 2024,
+    pricePerDay: 65,
+    category: "suv",
+    transmission: "automatica",
+    seats: 5,
+    fuelType: "hibrido",
+    images: ["/img/honda-cr1.jpg"],
+    available: true
+  },
+  {
+    _id: "3",
+    brand: "Hyundai",
+    model: "Tucson",
+    year: 2023,
+    pricePerDay: 55,
+    category: "suv",
+    transmission: "automatica",
+    seats: 5,
+    fuelType: "gasolina",
+    images: ["/img/hyundai_tucson_2023_1.jpeg"],
+    available: true
+  }
+];
+
+// Estadísticas de la empresa
+const stats = [
+  { number: "50+", label: "Vehículos Disponibles" },
+  { number: "1000+", label: "Clientes Satisfechos" },
+  { number: "24/7", label: "Soporte al Cliente" },
+  { number: "5", label: "Años de Experiencia" }
+];
 ---
 
 <MainLayout title="Inicio - Alex Renta Cars">
@@ -10,52 +63,358 @@ import HeroGifSection from '../components/HeroGifSection.astro';
   <!-- Sección de características -->
   <section class="features">
     <div class="container">
-      <h2 class="text-center mb-4">¿Por qué elegir Alex Renta Cars?</h2>
+      <div class="section-header">
+        <h2 class="section-title">¿Por qué elegir Alex Renta Cars?</h2>
+        <p class="section-subtitle">
+          Ofrecemos el servicio de renta de vehículos más confiable y completo de El Salvador
+        </p>
+      </div>
       <div class="grid grid-cols-3">
         <div class="feature-card">
-          <div class="feature-icon">🚗</div>
+          <div class="feature-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
+            </svg>
+          </div>
           <h3>Amplia Variedad</h3>
-          <p>Desde compactos económicos hasta SUVs de lujo para toda ocasión</p>
+          <p>Desde compactos económicos hasta SUVs de lujo para toda ocasión. Contamos con la flota más diversa del mercado.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon">💰</div>
+          <div class="feature-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+          </div>
           <h3>Mejores Precios</h3>
-          <p>Tarifas competitivas sin cargos ocultos y las mejores promociones</p>
+          <p>Tarifas competitivas sin cargos ocultos. Las mejores promociones y descuentos por renta prolongada.</p>
         </div>
         <div class="feature-card">
-          <div class="feature-icon">⭐</div>
+          <div class="feature-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+          </div>
           <h3>Servicio Premium</h3>
-          <p>Atención personalizada 24/7 con soporte en toda El Salvador</p>
+          <p>Atención personalizada 24/7 con soporte en toda El Salvador. Asistencia en carretera incluida.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Call to Action -->
-  <section class="cta">
+  <!-- Sección de Autos Populares -->
+  <section class="popular-cars">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Vehículos Más Populares</h2>
+        <p class="section-subtitle">
+          Descubre los vehículos favoritos de nuestros clientes
+        </p>
+      </div>
+      <div class="cars-grid">
+        {popularCars.map((car) => (
+          <a href={`/catalogo/${car._id}`} class="car-card">
+            <div class="car-card__image">
+              <img src={car.images[0]} alt={`${car.brand} ${car.model}`} />
+              <div class="car-card__overlay">
+                <span>Ver Detalles</span>
+              </div>
+            </div>
+            <div class="car-card__content">
+              <div class="car-card__header">
+                <h3>{car.brand} {car.model}</h3>
+                <span class="car-year">{car.year}</span>
+              </div>
+              <div class="car-card__specs">
+                <span class="spec">{car.transmission === 'automatica' ? 'Automática' : 'Manual'}</span>
+                <span class="spec">{car.seats} Asientos</span>
+                <span class="spec">
+                  {car.fuelType === 'gasolina' ? 'Gasolina' : 
+                   car.fuelType === 'diesel' ? 'Diésel' : 
+                   car.fuelType === 'electrico' ? 'Eléctrico' : 'Híbrido'}
+                </span>
+              </div>
+              <div class="car-card__price">
+                <span class="price">${car.pricePerDay}</span>
+                <span class="period">/día</span>
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+      <div class="section-cta">
+        <a href="/catalogo" class="btn btn-primary">
+          Ver Catálogo Completo
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Banner de Promoción -->
+  <section class="promo-banner">
+    <div class="container">
+      <div class="promo-content">
+        <div class="promo-text">
+          <h2>Oferta Especial de Verano</h2>
+          <p>Obtén 20% de descuento en rentas de 7 días o más. ¡Aprovecha esta promoción limitada!</p>
+          <div class="promo-features">
+            <span>✓ Sin cargos ocultos</span>
+            <span>✓ Seguro incluido</span>
+            <span>✓ Kilometraje ilimitado</span>
+          </div>
+        </div>
+        <div class="promo-cta">
+          <a href="/catalogo" class="btn btn-promo">
+            Reservar Ahora
+          </a>
+          <small>Válido hasta el 30 de Agosto 2024</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección de Proceso de Renta -->
+  <section class="process">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Cómo Rentar un Vehículo</h2>
+        <p class="section-subtitle">
+          Un proceso simple y rápido en 4 pasos
+        </p>
+      </div>
+      <div class="process-steps">
+        <div class="process-step">
+          <div class="step-number">1</div>
+          <h3>Selecciona tu Vehículo</h3>
+          <p>Elige el auto perfecto para tus necesidades de nuestro amplio catálogo</p>
+        </div>
+        <div class="process-step">
+          <div class="step-number">2</div>
+          <h3>Realiza tu Reserva</h3>
+          <p>Completa el formulario en línea con tus datos y fechas de renta</p>
+        </div>
+        <div class="process-step">
+          <div class="step-number">3</div>
+          <h3>Recoge tu Auto</h3>
+          <p>Recoge tu vehículo en nuestra sucursal con toda la documentación lista</p>
+        </div>
+        <div class="process-step">
+          <div class="step-number">4</div>
+          <h3>Disfruta tu Viaje</h3>
+          <p>Conduce con confianza y disfruta de tu experiencia con Alex Renta Cars</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección de Contacto -->
+  <section class="contact-section">
+    <div class="container">
+      <div class="contact-grid">
+        <div class="contact-info">
+          <div class="section-header">
+            <h2 class="section-title">Contáctanos</h2>
+            <p class="section-subtitle">
+              ¿Tienes preguntas? Estamos aquí para ayudarte
+            </p>
+          </div>
+          
+          <div class="contact-details">
+            <div class="contact-item">
+              <div class="contact-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                </svg>
+              </div>
+              <div class="contact-text">
+                <strong>Email</strong>
+                <span>info@alexrentacars.com</span>
+              </div>
+            </div>
+            
+            <div class="contact-item">
+              <div class="contact-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                </svg>
+              </div>
+              <div class="contact-text">
+                <strong>Teléfono</strong>
+                <span>+503 1234-5678</span>
+              </div>
+            </div>
+            
+            <div class="contact-item">
+              <div class="contact-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/>
+                </svg>
+              </div>
+              <div class="contact-text">
+                <strong>Ubicación</strong>
+                <span>San Salvador, El Salvador</span>
+              </div>
+            </div>
+            
+            <div class="contact-item">
+              <div class="contact-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                </svg>
+              </div>
+              <div class="contact-text">
+                <strong>Horarios</strong>
+                <span>Lun-Dom: 7:00 AM - 8:00 PM</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="contact-form-container">
+          <ContactForm />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mapa -->
+  <section class="map-section">
+    <GoogleMap />
+  </section>
+
+  <!-- Call to Action Final -->
+  <section class="cta-final">
     <div class="container text-center">
-      <h2>¿Listo para vivir la experiencia?</h2>
-      <p>Reserva ahora y disfruta de la mejor flota de vehículos en San Salvador</p>
-      <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
-        <a href="/catalogo" class="btn btn-primary">Ver Catálogo Completo</a>
-        <a href="/contacto" class="btn btn-secondary">Solicitar Cotización</a>
+      <h2>¿Listo para comenzar tu aventura?</h2>
+      <p>Únete a miles de clientes satisfechos que confían en Alex Renta Cars</p>
+      <div class="cta-buttons">
+        <a href="/catalogo" class="btn btn-primary">Explorar Catálogo</a>
+        <a href="/contacto" class="btn btn-secondary">Contactar Ahora</a>
       </div>
     </div>
   </section>
 </MainLayout>
 
 <style>
-  /* Features Section */
+  /* Importar fuente Lexend */
+  @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap');
+
+  /* Estilos base */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .text-center {
+    text-align: center;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .section-title {
+    font-family: 'Lexend', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+  }
+
+  .section-subtitle {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1.1rem;
+    color: #6b7280;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .section-cta {
+    text-align: center;
+    margin-top: 3rem;
+  }
+
+  /* Botones */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    font-family: 'Lexend', sans-serif;
+    cursor: pointer;
+  }
+
+  .btn-primary {
+    background: #dc2626;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: #b91c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: #1f2937;
+    border-color: #1f2937;
+  }
+
+  .btn-secondary:hover {
+    background: #1f2937;
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  /* Sección de Estadísticas */
+  .stats-section {
+    padding: 4rem 0;
+    background: #ffffff;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
+
+  .stat-item {
+    text-align: center;
+  }
+
+  .stat-number {
+    display: block;
+    font-family: 'Lexend', sans-serif;
+    font-size: 3rem;
+    font-weight: 700;
+    color: #dc2626;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-label {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1rem;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  /* Sección de Características */
   .features {
     padding: 5rem 0;
     background: #f8fafc;
-  }
-
-  .features h2 {
-    font-size: 2.5rem;
-    margin-bottom: 3rem;
-    color: #1f2937;
-    font-weight: 700;
   }
 
   .grid {
@@ -69,7 +428,7 @@ import HeroGifSection from '../components/HeroGifSection.astro';
 
   .feature-card {
     text-align: center;
-    padding: 2.5rem 1.5rem;
+    padding: 3rem 1.5rem;
     background: white;
     border-radius: 12px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -80,139 +439,455 @@ import HeroGifSection from '../components/HeroGifSection.astro';
   .feature-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    border-color: #dc2626;
   }
 
   .feature-icon {
-    font-size: 3.5rem;
+    color: #dc2626;
     margin-bottom: 1.5rem;
   }
 
   .feature-card h3 {
+    font-family: 'Lexend', sans-serif;
     font-size: 1.5rem;
     margin-bottom: 1rem;
-    color: #dc2626;
+    color: #1f2937;
     font-weight: 600;
   }
 
   .feature-card p {
+    font-family: 'Lexend', sans-serif;
     color: #6b7280;
     line-height: 1.6;
+    margin: 0;
   }
 
-  /* CTA Section */
-  .cta {
-    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  /* Sección de Autos Populares */
+  .popular-cars {
     padding: 5rem 0;
+    background: #ffffff;
+  }
+
+  .cars-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+
+  .car-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+  }
+
+  .car-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: #dc2626;
+  }
+
+  .car-card__image {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+  }
+
+  .car-card__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .car-card:hover .car-card__image img {
+    transform: scale(1.05);
+  }
+
+  .car-card__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(220, 38, 38, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .car-card:hover .car-card__overlay {
+    opacity: 1;
+  }
+
+  .car-card__overlay span {
+    color: white;
+    font-weight: 600;
+    font-family: 'Lexend', sans-serif;
+  }
+
+  .car-card__content {
+    padding: 1.5rem;
+  }
+
+  .car-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .car-card__header h3 {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+  }
+
+  .car-year {
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.9rem;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  .car-card__specs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .car-card__specs .spec {
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.8rem;
+    color: #6b7280;
+    background: #f8fafc;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+
+  .car-card__price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+  }
+
+  .car-card__price .price {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #dc2626;
+  }
+
+  .car-card__price .period {
+    font-size: 0.9rem;
+    color: #6b7280;
+  }
+
+  /* Banner de Promoción */
+  .promo-banner {
+    padding: 4rem 0;
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
     color: white;
   }
 
-  .cta h2 {
+  .promo-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  .promo-text h2 {
+    font-family: 'Lexend', sans-serif;
     font-size: 2.5rem;
-    margin-bottom: 1rem;
     font-weight: 700;
+    margin-bottom: 1rem;
   }
 
-  .cta p {
-    font-size: 1.25rem;
-    color: #d1d5db;
-    max-width: 600px;
-    margin: 0 auto;
+  .promo-text p {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.9;
   }
 
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 2rem;
+  .promo-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
   }
 
-  .text-center {
+  .promo-features span {
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.9rem;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+  }
+
+  .promo-cta {
     text-align: center;
   }
 
-  .mb-4 {
-    margin-bottom: 2rem;
-  }
-
-  /* Botones globales */
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
+  .btn-promo {
+    background: white;
+    color: #dc2626;
     padding: 1rem 2rem;
     border-radius: 8px;
     text-decoration: none;
     font-weight: 600;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
     font-family: 'Lexend', sans-serif;
+    transition: all 0.3s ease;
+    display: block;
+    margin-bottom: 1rem;
   }
 
-  .btn-primary {
+  .btn-promo:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .promo-cta small {
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.8rem;
+    opacity: 0.8;
+  }
+
+  /* Sección de Proceso */
+  .process {
+    padding: 5rem 0;
+    background: #f8fafc;
+  }
+
+  .process-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
+
+  .process-step {
+    text-align: center;
+  }
+
+  .step-number {
+    width: 60px;
+    height: 60px;
     background: #dc2626;
     color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Lexend', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 auto 1.5rem;
   }
 
-  .btn-primary:hover {
-    background: #b91c1c;
-    transform: translateY(-2px);
-  }
-
-  .btn-secondary {
-    background: transparent;
-    color: white;
-    border-color: white;
-  }
-
-  .btn-secondary:hover {
-    background: white;
+  .process-step h3 {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 600;
     color: #1f2937;
+    margin-bottom: 1rem;
+  }
+
+  .process-step p {
+    font-family: 'Lexend', sans-serif;
+    color: #6b7280;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* Sección de Contacto */
+  .contact-section {
+    padding: 5rem 0;
+    background: #ffffff;
+  }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+  }
+
+  .contact-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .contact-icon {
+    color: #dc2626;
+    margin-top: 0.25rem;
+    flex-shrink: 0;
+  }
+
+  .contact-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .contact-text strong {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1rem;
+    color: #1f2937;
+  }
+
+  .contact-text span {
+    font-family: 'Lexend', sans-serif;
+    color: #6b7280;
+  }
+
+  .contact-form-container {
+    background: #f8fafc;
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+  }
+
+  /* Sección del Mapa */
+  .map-section {
+    height: 400px;
+  }
+
+  /* CTA Final */
+  .cta-final {
+    padding: 5rem 0;
+    background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+    color: white;
+  }
+
+  .cta-final h2 {
+    font-family: 'Lexend', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .cta-final p {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1.25rem;
+    color: #d1d5db;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
   /* Responsive */
   @media (max-width: 1024px) {
-    .grid-cols-3 {
+    .grid-cols-3,
+    .stats-grid,
+    .process-steps {
       grid-template-columns: repeat(2, 1fr);
+    }
+
+    .cars-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .promo-content {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+
+    .contact-grid {
+      grid-template-columns: 1fr;
+      gap: 3rem;
     }
   }
 
   @media (max-width: 768px) {
-    .features,
-    .cta {
-      padding: 3rem 0;
+    .container {
+      padding: 0 1.5rem;
     }
 
-    .features h2,
-    .cta h2 {
+    .section-title {
       font-size: 2rem;
     }
 
-    .grid-cols-3 {
+    .grid-cols-3,
+    .stats-grid,
+    .process-steps,
+    .cars-grid {
       grid-template-columns: 1fr;
+    }
+
+    .features,
+    .popular-cars,
+    .process,
+    .contact-section,
+    .cta-final {
+      padding: 3rem 0;
+    }
+
+    .promo-banner {
+      padding: 3rem 0;
+    }
+
+    .promo-text h2 {
+      font-size: 2rem;
+    }
+
+    .cta-final h2 {
+      font-size: 2rem;
+    }
+
+    .cta-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .btn {
+      width: 100%;
+      max-width: 300px;
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .container {
+      padding: 0 1rem;
+    }
+
+    .section-title {
+      font-size: 1.75rem;
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
     }
 
     .feature-card {
       padding: 2rem 1rem;
     }
 
-    .container {
-      padding: 0 1rem;
-    }
-
-    .cta p {
-      font-size: 1.1rem;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .features h2,
-    .cta h2 {
-      font-size: 1.75rem;
-    }
-
-    .btn {
-      padding: 0.875rem 1.5rem;
-      font-size: 0.95rem;
+    .contact-form-container {
+      padding: 1.5rem;
     }
   }
 </style>

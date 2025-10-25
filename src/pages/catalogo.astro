@@ -1,14 +1,320 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
-import { getCollection } from 'astro:content';
+import CarCard from '../components/CarCard.astro';
 
-const collection = await getCollection('cars');
+// Datos de ejemplo (reemplazar con datos reales de tu API)
+const cars = [
+  {
+    _id: "1",
+    brand: "Toyota",
+    model: "Corolla",
+    year: 2023,
+    pricePerDay: 45,
+    category: "sedan",
+    transmission: "automatica",
+    seats: 5,
+    fuelType: "gasolina",
+    features: ["Aire Acondicionado", "Bluetooth", "Cámara de Retroceso"],
+    images: ["/img/toyota-corolla-2023-1.jpg"],
+    available: true,
+    description: "Sedán confiable y económico para viajes de negocios o placer."
+  },
+  {
+    _id: "2",
+    brand: "Honda",
+    model: "CR-V",
+    year: 2024,
+    pricePerDay: 65,
+    category: "suv",
+    transmission: "automatica",
+    seats: 5,
+    fuelType: "hibrido",
+    features: ["GPS", "Asientos de Cuero", "Sensores de Estacionamiento"],
+    images: ["/img/honda-cr1.jpg"],
+    available: true,
+    description: "SUV espacioso y eficiente para la familia."
+  },
+  {
+    _id: "3",
+    brand: "Nissan",
+    model: "Sentra",
+    year: 2023,
+    pricePerDay: 40,
+    category: "sedan",
+    transmission: "automatica",
+    seats: 5,
+    fuelType: "gasolina",
+    features: ["Control Crucero", "Apple CarPlay", "Android Auto"],
+    images: ["/img/centra2023-1.jpg"],
+    available: false,
+    description: "Sedán compacto con excelente rendimiento de combustible."
+  },
+  {
+    _id: "4",
+    brand: "Ford",
+    model: "Explorer",
+    year: 2024,
+    pricePerDay: 75,
+    category: "suv",
+    transmission: "automatica",
+    seats: 7,
+    fuelType: "gasolina",
+    features: ["Tercera Fila", "Sistema de Sonido Premium", "Control de Tracción"],
+    images: ["/img/ford-explorer1.jpg"],
+    available: true,
+    description: "SUV familiar con capacidad para 7 pasajeros."
+  },
+  {
+    _id: "5",
+    brand: "Hyundai",
+    model: "Tucson",
+    year: 2023,
+    pricePerDay: 55,
+    category: "suv",
+    transmission: "automatica",
+    seats: 5,
+    fuelType: "gasolina",
+    features: ["Techo Panorámico", "Asientos Calefaccionados", "Asistente de Carril"],
+    images: ["/img/hyundai_tucson_2023_1.jpeg"],
+    available: true,
+    description: "SUV versátil con tecnología avanzada."
+  },
+  {
+    _id: "6",
+    brand: "Chevrolet",
+    model: "Spark",
+    year: 2023,
+    pricePerDay: 30,
+    category: "compacto",
+    transmission: "manual",
+    seats: 4,
+    fuelType: "gasolina",
+    features: ["Aire Acondicionado", "Radio Bluetooth", "Bajo Consumo"],
+    images: ["/img/spark1.jpg"],
+    available: true,
+    description: "Compacto económico perfecto para la ciudad."
+  }
+];
 ---
 
 <MainLayout title="Catálogo - Alex Renta Cars">
-  <section class="hero">
-    <div class="container">
-      <h1>Catálogo de Vehículos</h1>
-      <p>Explore nuestro amplio catálogo de vehículos</p>
+  <section class="catalog">
+    <div class="catalog__container">
+      <!-- Header del Catálogo -->
+      <div class="catalog__header">
+        <h1 class="catalog__title">Nuestra Flota de Vehículos</h1>
+        <p class="catalog__subtitle">
+          Descubre nuestra amplia selección de vehículos para todas tus necesidades
+        </p>
+        
+        <!-- Filtros -->
+        <div class="catalog__filters">
+          <div class="filter-group">
+            <label for="category" class="filter-label">Categoría</label>
+            <select id="category" class="filter-select">
+              <option value="">Todas las categorías</option>
+              <option value="sedan">Sedán</option>
+              <option value="suv">SUV</option>
+              <option value="compacto">Compacto</option>
+              <option value="deportivo">Deportivo</option>
+              <option value="van">Van</option>
+              <option value="pickup">Pickup</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label for="transmission" class="filter-label">Transmisión</label>
+            <select id="transmission" class="filter-select">
+              <option value="">Cualquier transmisión</option>
+              <option value="automatica">Automática</option>
+              <option value="manual">Manual</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label for="price" class="filter-label">Precio máximo</label>
+            <select id="price" class="filter-select">
+              <option value="">Cualquier precio</option>
+              <option value="30">Hasta $30/día</option>
+              <option value="50">Hasta $50/día</option>
+              <option value="70">Hasta $70/día</option>
+              <option value="100">Hasta $100/día</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid de Vehículos -->
+      <div class="catalog__grid">
+        {cars.map((car) => (
+          <CarCard car={car} />
+        ))}
+      </div>
+
+      <!-- Mensaje si no hay vehículos -->
+      {cars.length === 0 && (
+        <div class="catalog__empty">
+          <h3>No se encontraron vehículos</h3>
+          <p>Intenta ajustar los filtros para ver más opciones</p>
+        </div>
+      )}
     </div>
   </section>
+</MainLayout>
+
+<style>
+  .catalog {
+    padding: 4rem 0;
+    min-height: 80vh;
+  }
+
+  .catalog__container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .catalog__header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .catalog__title {
+    font-family: 'Lexend', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+  }
+
+  .catalog__subtitle {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1.1rem;
+    color: #6b7280;
+    max-width: 600px;
+    margin: 0 auto 3rem;
+    line-height: 1.6;
+  }
+
+  .catalog__filters {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .filter-label {
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #374151;
+  }
+
+  .filter-select {
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: white;
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.9rem;
+    color: #374151;
+    min-width: 180px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .filter-select:focus {
+    outline: none;
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+  }
+
+  .catalog__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+  }
+
+  .catalog__empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #6b7280;
+  }
+
+  .catalog__empty h3 {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #374151;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .catalog__grid {
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .catalog {
+      padding: 3rem 0;
+    }
+
+    .catalog__container {
+      padding: 0 1.5rem;
+    }
+
+    .catalog__title {
+      font-size: 2rem;
+    }
+
+    .catalog__subtitle {
+      font-size: 1rem;
+    }
+
+    .catalog__filters {
+      gap: 1rem;
+    }
+
+    .filter-select {
+      min-width: 160px;
+    }
+
+    .catalog__grid {
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .catalog__container {
+      padding: 0 1rem;
+    }
+
+    .catalog__title {
+      font-size: 1.75rem;
+    }
+
+    .catalog__filters {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .filter-group {
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .catalog__grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+</style>

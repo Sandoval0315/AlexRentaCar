@@ -1,0 +1,294 @@
+---
+export interface Car {
+  _id: string;
+  brand: string;
+  model: string;
+  year: number;
+  pricePerDay: number;
+  category: string;
+  transmission: string;
+  seats: number;
+  fuelType: string;
+  features: string[];
+  images: string[];
+  available: boolean;
+  description?: string;
+}
+
+interface Props {
+  car: Car;
+}
+
+const { car } = Astro.props;
+---
+
+<a href={`/catalogo/${car._id}`} class="car-card">
+  <div class="car-card__image-container">
+    <img 
+      src={car.images[0] || '/images/car-placeholder.jpg'} 
+      alt={`${car.brand} ${car.model} ${car.year}`}
+      class="car-card__image"
+      loading="lazy"
+    />
+    {!car.available && <div class="car-card__badge">No Disponible</div>}
+    <div class="car-card__overlay">
+      <span class="car-card__view-details">Ver Detalles</span>
+    </div>
+  </div>
+
+  <div class="car-card__content">
+    <div class="car-card__header">
+      <h3 class="car-card__title">{car.brand} {car.model}</h3>
+      <span class="car-card__year">{car.year}</span>
+    </div>
+
+    <div class="car-card__specs">
+      <div class="car-card__spec">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M21.98 7.448L19.62 0H4.38L2.02 7.448c-.14.499-.02 1.035.327 1.451l8.652 10.144c.367.429.92.683 1.505.683s1.139-.254 1.505-.683l8.652-10.144c.347-.416.467-.952.327-1.451zM12 19.101l-7.04-8.254 1.893-6.647h10.294l1.893 6.647L12 19.101z"/>
+        </svg>
+        <span>{car.category}</span>
+      </div>
+      <div class="car-card__spec">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+        </svg>
+        <span>{car.transmission === 'automatica' ? 'Automática' : 'Manual'}</span>
+      </div>
+      <div class="car-card__spec">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V7H1v10h22v-6c0-2.21-1.79-4-4-4z"/>
+        </svg>
+        <span>{car.seats} Asientos</span>
+      </div>
+    </div>
+
+    <div class="car-card__footer">
+      <div class="car-card__price">
+        <span class="car-card__price-amount">${car.pricePerDay}</span>
+        <span class="car-card__price-period">/día</span>
+      </div>
+      <div class="car-card__fuel">
+        <span class={`car-card__fuel-type car-card__fuel-type--${car.fuelType}`}>
+          {car.fuelType === 'gasolina' ? 'Gasolina' : 
+           car.fuelType === 'diesel' ? 'Diésel' : 
+           car.fuelType === 'electrico' ? 'Eléctrico' : 'Híbrido'}
+        </span>
+      </div>
+    </div>
+  </div>
+</a>
+
+<style>
+  .car-card {
+    display: block;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .car-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: #dc2626;
+  }
+
+  .car-card__image-container {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+    background: #f8fafc;
+  }
+
+  .car-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .car-card:hover .car-card__image {
+    transform: scale(1.05);
+  }
+
+  .car-card__badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #ef4444;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    z-index: 2;
+  }
+
+  .car-card__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(220, 38, 38, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .car-card:hover .car-card__overlay {
+    opacity: 1;
+  }
+
+  .car-card__view-details {
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .car-card__content {
+    padding: 1.5rem;
+  }
+
+  .car-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .car-card__title {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0;
+    line-height: 1.2;
+  }
+
+  .car-card__year {
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.9rem;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  .car-card__specs {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .car-card__spec {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #4b5563;
+  }
+
+  .car-card__spec svg {
+    color: #dc2626;
+    opacity: 0.8;
+  }
+
+  .car-card__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid #f3f4f6;
+  }
+
+  .car-card__price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+  }
+
+  .car-card__price-amount {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #dc2626;
+  }
+
+  .car-card__price-period {
+    font-size: 0.8rem;
+    color: #6b7280;
+  }
+
+  .car-card__fuel-type {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+  }
+
+  .car-card__fuel-type--gasolina {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .car-card__fuel-type--diesel {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  .car-card__fuel-type--electrico {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  .car-card__fuel-type--hibrido {
+    background: #f3e8ff;
+    color: #7e22ce;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .car-card__image-container {
+      height: 180px;
+    }
+
+    .car-card__content {
+      padding: 1.25rem;
+    }
+
+    .car-card__title {
+      font-size: 1rem;
+    }
+
+    .car-card__specs {
+      margin-bottom: 1.25rem;
+    }
+
+    .car-card__price-amount {
+      font-size: 1.1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .car-card__header {
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: flex-start;
+    }
+
+    .car-card__year {
+      align-self: flex-start;
+    }
+  }
+</style>
