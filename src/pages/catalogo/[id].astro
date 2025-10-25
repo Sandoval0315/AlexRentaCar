@@ -53,11 +53,15 @@ const { id } = Astro.params;
               src={car.images[0]} 
               alt={`${car.brand} ${car.model}`}
               class="car-detail__image"
+              id="main-image"
             />
           </div>
           <div class="car-detail__thumbnails">
             {car.images.map((image, index) => (
-              <button class="car-detail__thumbnail">
+              <button 
+                class="car-detail__thumbnail"
+                onclick={`document.getElementById('main-image').src = '${image}'`}
+              >
                 <img 
                   src={image} 
                   alt={`${car.brand} ${car.model} - Vista ${index + 1}`}
@@ -70,62 +74,94 @@ const { id } = Astro.params;
 
         <!-- Información del Auto -->
         <div class="car-detail__info">
+          <!-- Header Compacto -->
           <div class="car-detail__header">
-            <h1 class="car-detail__title">{car.brand} {car.model}</h1>
-            <span class="car-detail__year">{car.year}</span>
-          </div>
-
-          <div class="car-detail__price">
-            <span class="car-detail__price-amount">${car.pricePerDay}</span>
-            <span class="car-detail__price-period">/ por día</span>
-          </div>
-
-          <div class="car-detail__status">
-            <span class={`car-detail__availability ${car.available ? 'car-detail__availability--available' : 'car-detail__availability--unavailable'}`}>
-              {car.available ? 'Disponible' : 'No Disponible'}
-            </span>
+            <div class="car-detail__title-section">
+              <h1 class="car-detail__title">{car.brand} {car.model}</h1>
+              <div class="car-detail__meta">
+                <span class="car-detail__year">{car.year}</span>
+                <span class={`car-detail__availability ${car.available ? 'car-detail__availability--available' : 'car-detail__availability--unavailable'}`}>
+                  {car.available ? 'Disponible' : 'No Disponible'}
+                </span>
+              </div>
+            </div>
+            <div class="car-detail__price">
+              <span class="car-detail__price-amount">${car.pricePerDay}</span>
+              <span class="car-detail__price-period">/día</span>
+            </div>
           </div>
 
           <p class="car-detail__description">{car.description}</p>
 
-          <!-- Especificaciones -->
+          <!-- Especificaciones en Grid Compacto -->
           <div class="car-detail__specs">
-            <h3 class="car-detail__specs-title">Especificaciones</h3>
+            <h3 class="car-detail__section-title">Especificaciones</h3>
             <div class="car-detail__specs-grid">
-              <div class="car-detail__spec">
-                <span class="car-detail__spec-label">Categoría</span>
-                <span class="car-detail__spec-value">
-                  {car.category === 'sedan' ? 'Sedán' : 
-                   car.category === 'suv' ? 'SUV' : 
-                   car.category === 'compacto' ? 'Compacto' : 
-                   car.category === 'deportivo' ? 'Deportivo' : 
-                   car.category === 'van' ? 'Van' : 'Pickup'}
-                </span>
+              <div class="car-detail__spec-item">
+                <div class="car-detail__spec-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M21.98 7.448L19.62 0H4.38L2.02 7.448c-.14.499-.02 1.035.327 1.451l8.652 10.144c.367.429.92.683 1.505.683s1.139-.254 1.505-.683l8.652-10.144c.347-.416.467-.952.327-1.451zM12 19.101l-7.04-8.254 1.893-6.647h10.294l1.893 6.647L12 19.101z"/>
+                  </svg>
+                </div>
+                <div class="car-detail__spec-content">
+                  <span class="car-detail__spec-label">Categoría</span>
+                  <span class="car-detail__spec-value">
+                    {car.category === 'sedan' ? 'Sedán' : 
+                     car.category === 'suv' ? 'SUV' : 
+                     car.category === 'compacto' ? 'Compacto' : 
+                     car.category === 'deportivo' ? 'Deportivo' : 
+                     car.category === 'van' ? 'Van' : 'Pickup'}
+                  </span>
+                </div>
               </div>
-              <div class="car-detail__spec">
-                <span class="car-detail__spec-label">Transmisión</span>
-                <span class="car-detail__spec-value">
-                  {car.transmission === 'automatica' ? 'Automática' : 'Manual'}
-                </span>
+
+              <div class="car-detail__spec-item">
+                <div class="car-detail__spec-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+                  </svg>
+                </div>
+                <div class="car-detail__spec-content">
+                  <span class="car-detail__spec-label">Transmisión</span>
+                  <span class="car-detail__spec-value">
+                    {car.transmission === 'automatica' ? 'Automática' : 'Manual'}
+                  </span>
+                </div>
               </div>
-              <div class="car-detail__spec">
-                <span class="car-detail__spec-label">Combustible</span>
-                <span class="car-detail__spec-value">
-                  {car.fuelType === 'gasolina' ? 'Gasolina' : 
-                   car.fuelType === 'diesel' ? 'Diésel' : 
-                   car.fuelType === 'electrico' ? 'Eléctrico' : 'Híbrido'}
-                </span>
+
+              <div class="car-detail__spec-item">
+                <div class="car-detail__spec-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
+                  </svg>
+                </div>
+                <div class="car-detail__spec-content">
+                  <span class="car-detail__spec-label">Combustible</span>
+                  <span class="car-detail__spec-value">
+                    {car.fuelType === 'gasolina' ? 'Gasolina' : 
+                     car.fuelType === 'diesel' ? 'Diésel' : 
+                     car.fuelType === 'electrico' ? 'Eléctrico' : 'Híbrido'}
+                  </span>
+                </div>
               </div>
-              <div class="car-detail__spec">
-                <span class="car-detail__spec-label">Asientos</span>
-                <span class="car-detail__spec-value">{car.seats} pasajeros</span>
+
+              <div class="car-detail__spec-item">
+                <div class="car-detail__spec-icon">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V7H1v10h22v-6c0-2.21-1.79-4-4-4z"/>
+                  </svg>
+                </div>
+                <div class="car-detail__spec-content">
+                  <span class="car-detail__spec-label">Asientos</span>
+                  <span class="car-detail__spec-value">{car.seats} pasajeros</span>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- Características -->
           <div class="car-detail__features">
-            <h3 class="car-detail__features-title">Características</h3>
+            <h3 class="car-detail__section-title">Características Incluidas</h3>
             <div class="car-detail__features-grid">
               {car.features.map((feature) => (
                 <div class="car-detail__feature">
@@ -140,7 +176,7 @@ const { id } = Astro.params;
 
           <!-- Formulario de Reserva -->
           <div class="car-detail__booking">
-            <h3 class="car-detail__booking-title">Reservar este vehículo</h3>
+            <h3 class="car-detail__section-title">Reservar este vehículo</h3>
             <form class="car-detail__booking-form">
               <div class="car-detail__form-row">
                 <div class="car-detail__form-group">
@@ -280,9 +316,10 @@ const { id } = Astro.params;
   }
 
   .car-detail__main-image {
-    border-radius: 12px;
+    border-radius: 16px;
     overflow: hidden;
     background: #f8fafc;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 
   .car-detail__image {
@@ -323,58 +360,52 @@ const { id } = Astro.params;
     gap: 2rem;
   }
 
+  /* Header Compacto */
   .car-detail__header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .car-detail__title-section {
+    flex: 1;
   }
 
   .car-detail__title {
     font-family: 'Lexend', sans-serif;
     font-size: 2rem;
     font-weight: 700;
-    color: #1f2937;
-    margin: 0;
+    color: #0f172a;
+    margin: 0 0 0.75rem 0;
+    line-height: 1.1;
+  }
+
+  .car-detail__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
   }
 
   .car-detail__year {
     font-family: 'Lexend', sans-serif;
-    font-size: 1rem;
-    color: #6b7280;
-    background: #f3f4f6;
-    padding: 4px 8px;
-    border-radius: 6px;
+    font-size: 0.9rem;
+    color: #64748b;
+    background: #f8fafc;
+    padding: 4px 10px;
+    border-radius: 12px;
     font-weight: 500;
-  }
-
-  .car-detail__price {
-    display: flex;
-    align-items: baseline;
-    gap: 0.5rem;
-  }
-
-  .car-detail__price-amount {
-    font-family: 'Lexend', sans-serif;
-    font-size: 2rem;
-    font-weight: 700;
-    color: #dc2626;
-  }
-
-  .car-detail__price-period {
-    font-size: 1rem;
-    color: #6b7280;
-  }
-
-  .car-detail__status {
-    margin-top: -1rem;
   }
 
   .car-detail__availability {
     font-family: 'Lexend', sans-serif;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     font-weight: 600;
-    padding: 6px 12px;
-    border-radius: 20px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 
   .car-detail__availability--available {
@@ -387,58 +418,110 @@ const { id } = Astro.params;
     color: #dc2626;
   }
 
+  .car-detail__price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    flex-shrink: 0;
+  }
+
+  .car-detail__price-amount {
+    font-family: 'Lexend', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #dc2626;
+    line-height: 1;
+  }
+
+  .car-detail__price-period {
+    font-size: 0.9rem;
+    color: #64748b;
+    font-weight: 500;
+  }
+
   .car-detail__description {
     font-family: 'Lexend', sans-serif;
     font-size: 1rem;
     line-height: 1.6;
-    color: #4b5563;
+    color: #475569;
     margin: 0;
+  }
+
+  /* Secciones */
+  .car-detail__section-title {
+    font-family: 'Lexend', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 1.25rem;
   }
 
   .car-detail__specs,
   .car-detail__features,
   .car-detail__booking {
     padding-top: 2rem;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid #f1f5f9;
   }
 
-  .car-detail__specs-title,
-  .car-detail__features-title,
-  .car-detail__booking-title {
-    font-family: 'Lexend', sans-serif;
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: #1f2937;
-    margin-bottom: 1.5rem;
-  }
-
+  /* Especificaciones en Grid */
   .car-detail__specs-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
   }
 
-  .car-detail__spec {
+  .car-detail__spec-item {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 0.75rem 0;
-    border-bottom: 1px solid #f3f4f6;
+    gap: 0.75rem;
+    padding: 0.875rem;
+    background: #f8fafc;
+    border-radius: 10px;
+    transition: background-color 0.2s ease;
+  }
+
+  .car-detail__spec-item:hover {
+    background: #f1f5f9;
+  }
+
+  .car-detail__spec-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: #dc2626;
+    color: white;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  .car-detail__spec-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .car-detail__spec-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
   }
 
   .car-detail__spec-label {
     font-family: 'Lexend', sans-serif;
-    font-size: 0.9rem;
-    color: #6b7280;
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 500;
   }
 
   .car-detail__spec-value {
     font-family: 'Lexend', sans-serif;
     font-size: 0.9rem;
-    font-weight: 500;
-    color: #374151;
+    font-weight: 600;
+    color: #0f172a;
   }
 
+  /* Características */
   .car-detail__features-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -452,6 +535,7 @@ const { id } = Astro.params;
     font-family: 'Lexend', sans-serif;
     font-size: 0.9rem;
     color: #374151;
+    padding: 0.5rem 0;
   }
 
   .car-detail__feature svg {
@@ -459,6 +543,7 @@ const { id } = Astro.params;
     flex-shrink: 0;
   }
 
+  /* Formulario */
   .car-detail__booking-form {
     display: flex;
     flex-direction: column;
@@ -512,7 +597,7 @@ const { id } = Astro.params;
     background: #dc2626;
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     font-family: 'Lexend', sans-serif;
     font-size: 1rem;
     font-weight: 600;
@@ -531,7 +616,8 @@ const { id } = Astro.params;
     transform: none;
   }
 
-  /* Responsive */
+  /* === RESPONSIVE DESIGN === */
+
   @media (max-width: 1024px) {
     .car-detail__content {
       gap: 3rem;
@@ -571,21 +657,21 @@ const { id } = Astro.params;
     .car-detail__form-row {
       grid-template-columns: 1fr;
     }
+
+    .car-detail__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .car-detail__price {
+      align-self: flex-start;
+    }
   }
 
   @media (max-width: 480px) {
     .car-detail__container {
       padding: 0 1rem;
-    }
-
-    .car-detail__header {
-      flex-direction: column;
-      gap: 0.5rem;
-      align-items: flex-start;
-    }
-
-    .car-detail__year {
-      align-self: flex-start;
     }
 
     .car-detail__title {
@@ -602,6 +688,12 @@ const { id } = Astro.params;
 
     .car-detail__thumbnail {
       flex: 0 0 calc(33.333% - 0.5rem);
+    }
+
+    .car-detail__meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
     }
   }
 </style>

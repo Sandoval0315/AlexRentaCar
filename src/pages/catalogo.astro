@@ -107,8 +107,16 @@ const cars = [
           Descubre nuestra amplia selección de vehículos para todas tus necesidades
         </p>
         
+        <!-- Botón para mostrar/ocultar filtros en móviles -->
+        <button class="catalog__filters-toggle" id="filters-toggle">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/>
+          </svg>
+          Filtros
+        </button>
+
         <!-- Filtros -->
-        <div class="catalog__filters">
+        <div class="catalog__filters" id="filters-container">
           <div class="filter-group">
             <label for="category" class="filter-label">Categoría</label>
             <select id="category" class="filter-select">
@@ -141,6 +149,10 @@ const cars = [
               <option value="100">Hasta $100/día</option>
             </select>
           </div>
+
+          <button class="filters-apply" id="apply-filters">
+            Aplicar Filtros
+          </button>
         </div>
       </div>
 
@@ -192,28 +204,54 @@ const cars = [
     font-size: 1.1rem;
     color: #6b7280;
     max-width: 600px;
-    margin: 0 auto 3rem;
+    margin: 0 auto 2rem;
     line-height: 1.6;
+  }
+
+  /* Botón toggle para filtros en móviles */
+  .catalog__filters-toggle {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 0 auto 1.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .catalog__filters-toggle:hover {
+    background: #b91c1c;
+    transform: translateY(-1px);
   }
 
   .catalog__filters {
     display: flex;
     justify-content: center;
-    gap: 2rem;
+    gap: 1.5rem;
     flex-wrap: wrap;
+    transition: all 0.3s ease;
   }
 
   .filter-group {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    min-width: 160px;
   }
 
   .filter-label {
     font-family: 'Lexend', sans-serif;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 500;
     color: #374151;
+    text-align: left;
   }
 
   .filter-select {
@@ -224,7 +262,6 @@ const cars = [
     font-family: 'Lexend', sans-serif;
     font-size: 0.9rem;
     color: #374151;
-    min-width: 180px;
     transition: all 0.3s ease;
     cursor: pointer;
   }
@@ -233,6 +270,27 @@ const cars = [
     outline: none;
     border-color: #dc2626;
     box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+  }
+
+  .filters-apply {
+    display: none;
+    padding: 0.75rem 1.5rem;
+    background: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Lexend', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    align-self: flex-end;
+    margin-top: 1.5rem;
+  }
+
+  .filters-apply:hover {
+    background: #b91c1c;
+    transform: translateY(-1px);
   }
 
   .catalog__grid {
@@ -254,14 +312,25 @@ const cars = [
     color: #374151;
   }
 
-  /* Responsive */
+  /* === RESPONSIVE DESIGN === */
+
+  /* Tablets */
   @media (max-width: 1024px) {
     .catalog__grid {
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 1.5rem;
     }
+
+    .catalog__filters {
+      gap: 1.25rem;
+    }
+
+    .filter-group {
+      min-width: 140px;
+    }
   }
 
+  /* Tablets pequeñas y móviles */
   @media (max-width: 768px) {
     .catalog {
       padding: 3rem 0;
@@ -277,14 +346,47 @@ const cars = [
 
     .catalog__subtitle {
       font-size: 1rem;
+      margin-bottom: 1.5rem;
     }
 
+    /* Mostrar botón toggle en móviles */
+    .catalog__filters-toggle {
+      display: flex;
+    }
+
+    /* Ocultar filtros por defecto en móviles */
     .catalog__filters {
+      display: none;
+      flex-direction: column;
+      align-items: stretch;
       gap: 1rem;
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e5e7eb;
+      margin-bottom: 2rem;
+    }
+
+    .catalog__filters.active {
+      display: flex;
+    }
+
+    .filter-group {
+      min-width: auto;
+    }
+
+    .filter-label {
+      text-align: left;
     }
 
     .filter-select {
-      min-width: 160px;
+      width: 100%;
+    }
+
+    /* Mostrar botón aplicar en móviles */
+    .filters-apply {
+      display: block;
     }
 
     .catalog__grid {
@@ -293,6 +395,7 @@ const cars = [
     }
   }
 
+  /* Móviles */
   @media (max-width: 480px) {
     .catalog__container {
       padding: 0 1rem;
@@ -303,18 +406,104 @@ const cars = [
     }
 
     .catalog__filters {
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .filter-group {
-      width: 100%;
-      max-width: 300px;
+      padding: 1.25rem;
     }
 
     .catalog__grid {
       grid-template-columns: 1fr;
       gap: 1rem;
     }
+
+    .filter-select {
+      padding: 0.875rem 1rem;
+    }
+  }
+
+  /* Móviles pequeños */
+  @media (max-width: 360px) {
+    .catalog__container {
+      padding: 0 0.75rem;
+    }
+
+    .catalog__title {
+      font-size: 1.5rem;
+    }
+
+    .catalog__filters-toggle {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .catalog__filters {
+      padding: 1rem;
+    }
   }
 </style>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', function() {
+    const filtersToggle = document.getElementById('filters-toggle');
+    const filtersContainer = document.getElementById('filters-container');
+    const applyFiltersBtn = document.getElementById('apply-filters');
+
+    // Toggle de filtros en móviles
+    if (filtersToggle && filtersContainer) {
+      filtersToggle.addEventListener('click', function() {
+        filtersContainer.classList.toggle('active');
+        
+        // Cambiar texto del botón
+        if (filtersContainer.classList.contains('active')) {
+          this.innerHTML = `
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+            </svg>
+            Cerrar Filtros
+          `;
+        } else {
+          this.innerHTML = `
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/>
+            </svg>
+            Filtros
+          `;
+        }
+      });
+    }
+
+    // Aplicar filtros en móviles
+    if (applyFiltersBtn) {
+      applyFiltersBtn.addEventListener('click', function() {
+        // Aquí iría la lógica para aplicar los filtros
+        console.log('Aplicando filtros...');
+        
+        // Cerrar el panel de filtros después de aplicar
+        if (filtersContainer.classList.contains('active')) {
+          filtersToggle.click();
+        }
+      });
+    }
+
+    // Cerrar filtros al hacer clic fuera en móviles
+    document.addEventListener('click', function(event) {
+      if (window.innerWidth <= 768 && 
+          filtersContainer && 
+          filtersContainer.classList.contains('active') &&
+          !filtersContainer.contains(event.target) &&
+          !filtersToggle.contains(event.target)) {
+        filtersToggle.click();
+      }
+    });
+
+    // Manejar cambios en los selects (filtrado automático en desktop)
+    const filterSelects = document.querySelectorAll('.filter-select');
+    filterSelects.forEach(select => {
+      select.addEventListener('change', function() {
+        if (window.innerWidth > 768) {
+          // En desktop, aplicar filtros automáticamente
+          console.log('Filtrando en desktop...');
+          // Aquí iría la lógica de filtrado
+        }
+      });
+    });
+  });
+</script>
