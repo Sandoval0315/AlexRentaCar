@@ -47,9 +47,11 @@ const publicConfig = getPublicConfig();
 
         <label>Resumen<textarea name="summary" rows="4"></textarea></label>
         <label>URLs de imagen<textarea name="imagesText" rows="3" placeholder="Una por linea"></textarea></label>
-        <label>Subir imagenes
-          <input id="import-image-upload" type="file" accept="image/*" multiple />
-        </label>
+        {publicConfig.cloudinaryCloudName && (
+          <label>Subir imagenes
+            <input id="import-image-upload" type="file" accept="image/*" multiple />
+          </label>
+        )}
 
         <div class="form-actions">
           <button type="submit">Guardar importacion</button>
@@ -182,7 +184,7 @@ const publicConfig = getPublicConfig();
       const manualUrls = String(data.get('imagesText') || '').split('\n').map((item) => item.trim()).filter(Boolean);
 
       try {
-        const uploadedUrls = await uploadFiles(Array.from(uploadInput.files || []));
+        const uploadedUrls = await uploadFiles(Array.from(uploadInput?.files || []));
         const payload = {
           title: String(data.get('title') || ''),
           client_name: String(data.get('client_name') || ''),
