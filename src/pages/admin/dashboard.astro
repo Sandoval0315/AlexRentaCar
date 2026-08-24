@@ -1,0 +1,238 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { requireAdmin } from '../../lib/admin-auth.js';
+import { formatCurrency, formatDate, getDashboardSummary, getPublicConfig } from '../../lib/data.js';
+
+const session = await requireAdmin(Astro);
+if (session instanceof Response) return session;
+
+const summary = await getDashboardSummary(session.accessToken);
+const config = getPublicConfig();
+---
+
+<AdminLayout
+  title="Dashboard"
+  currentPath="/admin/dashboard"
+  sessionEmail={session.email}
+>
+  <section class="admin-grid admin-grid--stats">
+    <article class="stat-card">
+      <span>Alquileres cargados</span>
+      <strong>{summary.rentalsTotal}</strong>
+      <small>{summary.rentalsAvailable} disponibles ahora</small>
+    </article>
+    <article class="stat-card">
+      <span>Importaciones</span>
+      <strong>{summary.importsTotal}</strong>
+      <small>{summary.importsDelivered} entregadas</small>
+    </article>
+    <article class="stat-card">
+      <span>Solicitudes</span>
+      <strong>{summary.rentalRequestsTotal}</strong>
+      <small>{summary.rentalRequestsPending} pendientes</small>
+    </article>
+    <article class="stat-card">
+      <span>Cloudinary</span>
+      <strong>{config.cloudinaryCloudName ? 'Listo' : 'Pendiente'}</strong>
+      <small>{config.cloudinaryCloudName ? 'Subida directa activa' : 'Faltan variables Cloudinary'}</small>
+    </article>
+  </section>
+
+  <section class="admin-grid admin-grid--two">
+    <article class="panel">
+      <div class="panel__header">
+        <div>
+          <span class="panel__eyebrow">Ultimos alquileres</span>
+          <h2>Flota publicada</h2>
+        </div>
+        <a href="/admin/carros">Administrar</a>
+      </div>
+
+      <div class="list">
+        {summary.recentRentals.map((item) => (
+          <div class="list-item">
+            <img src={item.images[0] || '/img/toyota-corolla-2023-1.jpg'} alt={`${item.brand} ${item.model}`} />
+            <div>
+              <strong>{item.brand} {item.model}</strong>
+              <p>{item.year} · {item.status}</p>
+            </div>
+            <span>{formatCurrency(item.price_per_day)}/dia</span>
+          </div>
+        ))}
+      </div>
+    </article>
+
+    <article class="panel">
+      <div class="panel__header">
+        <div>
+          <span class="panel__eyebrow">Ultimas importaciones</span>
+          <h2>Seguimiento</h2>
+        </div>
+        <a href="/admin/reservas">Administrar</a>
+      </div>
+
+      <div class="list">
+        {summary.recentImports.map((item) => (
+          <div class="list-item">
+            <img src={item.images[0] || '/img/ford-explorer1.jpg'} alt={item.title} />
+            <div>
+              <strong>{item.title}</strong>
+              <p>{item.shipping_method} · {item.status}</p>
+            </div>
+            <span>{item.transit_time_days} dias</span>
+          </div>
+        ))}
+      </div>
+    </article>
+  </section>
+
+  <section class="admin-grid admin-grid--two">
+    <article class="panel">
+      <div class="panel__header">
+        <div>
+          <span class="panel__eyebrow">Solicitudes recientes</span>
+          <h2>Rentas por confirmar</h2>
+        </div>
+        <a href="/admin/solicitudes">Ver todas</a>
+      </div>
+
+      <div class="list">
+        {summary.recentRentalRequests.map((item) => (
+          <div class="list-item list-item--no-image">
+            <div>
+              <strong>{item.customer_name}</strong>
+              <p>{item.rental_snapshot?.brand} {item.rental_snapshot?.model} · {formatDate(item.start_date)}</p>
+            </div>
+            <span>{item.status}</span>
+          </div>
+        ))}
+      </div>
+    </article>
+
+    <article class="panel">
+      <span class="panel__eyebrow">Configuracion necesaria</span>
+      <h2>Checklist tecnico</h2>
+      <ul class="checklist">
+        <li>Ejecuta `supabase-schema.sql` en tu proyecto de Supabase.</li>
+        <li>Agrega las variables de `.env.example` en Vercel/local.</li>
+        <li>Para fotos desde el admin, configura `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` y `CLOUDINARY_API_SECRET`.</li>
+      </ul>
+    </article>
+  </section>
+</AdminLayout>
+
+<style>
+  .admin-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .admin-grid--stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .admin-grid--two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stat-card,
+  .panel {
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 26px;
+    padding: 1.25rem;
+    box-shadow: 0 18px 50px rgba(15, 23, 42, 0.07);
+  }
+
+  .stat-card span,
+  .panel__eyebrow {
+    color: #dc2626;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 0.72rem;
+  }
+
+  .stat-card strong {
+    display: block;
+    margin: 0.6rem 0 0.35rem;
+    font-size: 2rem;
+  }
+
+  .stat-card small {
+    color: #6b7280;
+  }
+
+  .panel__header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .panel__header a {
+    color: #111827;
+    text-decoration: none;
+    font-weight: 700;
+  }
+
+  .list,
+  .timeline,
+  .checklist {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .list-item {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr) auto;
+    gap: 0.8rem;
+    align-items: center;
+    padding: 0.75rem;
+    border-radius: 18px;
+    background: #fff;
+  }
+
+  .list-item--no-image {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .list-item img {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    object-fit: cover;
+  }
+
+  .list-item p,
+  .timeline p,
+  .checklist {
+    color: #6b7280;
+  }
+
+  .timeline__item {
+    padding: 0.85rem 1rem;
+    border-left: 3px solid #f97316;
+    background: rgba(255, 255, 255, 0.65);
+    border-radius: 0 18px 18px 0;
+  }
+
+  .checklist {
+    padding-left: 1.1rem;
+  }
+
+  @media (max-width: 900px) {
+    .admin-grid--stats,
+    .admin-grid--two {
+      grid-template-columns: 1fr;
+    }
+
+    .list-item {
+      grid-template-columns: 56px minmax(0, 1fr);
+    }
+
+    .list-item span {
+      grid-column: 2;
+    }
+  }
+</style>

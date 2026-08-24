@@ -3,57 +3,10 @@ import MainLayout from '../layouts/MainLayout.astro';
 import HeroGifSection from '../components/HeroGifSection.astro';
 import ContactForm from '../components/ContactForm.astro';
 import GoogleMap from '../components/GoogleMap.astro';
+import { getFeaturedRentals } from '../lib/data.js';
 
-// Datos de autos populares
-const popularCars = [
-  {
-    _id: "1",
-    brand: "Toyota",
-    model: "Corolla",
-    year: 2023,
-    pricePerDay: 45,
-    category: "sedan",
-    transmission: "automatica",
-    seats: 5,
-    fuelType: "gasolina",
-    images: ["/img/toyota-corolla-2023-1.jpg"],
-    available: true
-  },
-  {
-    _id: "2",
-    brand: "Honda",
-    model: "CR-V",
-    year: 2024,
-    pricePerDay: 65,
-    category: "suv",
-    transmission: "automatica",
-    seats: 5,
-    fuelType: "hibrido",
-    images: ["/img/honda-cr1.jpg"],
-    available: true
-  },
-  {
-    _id: "3",
-    brand: "Hyundai",
-    model: "Tucson",
-    year: 2023,
-    pricePerDay: 55,
-    category: "suv",
-    transmission: "automatica",
-    seats: 5,
-    fuelType: "gasolina",
-    images: ["/img/hyundai_tucson_2023_1.jpeg"],
-    available: true
-  }
-];
+const popularCars = await getFeaturedRentals(3);
 
-// Estadísticas de la empresa
-const stats = [
-  { number: "50+", label: "Vehículos Disponibles" },
-  { number: "1000+", label: "Clientes Satisfechos" },
-  { number: "24/7", label: "Soporte al Cliente" },
-  { number: "5", label: "Años de Experiencia" }
-];
 ---
 
 <MainLayout title="Inicio - Alex Renta Cars">
@@ -112,7 +65,7 @@ const stats = [
       </div>
       <div class="cars-grid">
         {popularCars.map((car) => (
-          <a href={`/catalogo/${car._id}`} class="car-card">
+          <a href={`/catalogo/${car.id}`} class="car-card">
             <div class="car-card__image">
               <img src={car.images[0]} alt={`${car.brand} ${car.model}`} />
               <div class="car-card__overlay">
@@ -128,14 +81,14 @@ const stats = [
                 <span class="spec">{car.transmission === 'automatica' ? 'Automática' : 'Manual'}</span>
                 <span class="spec">{car.seats} Asientos</span>
                 <span class="spec">
-                  {car.fuelType === 'gasolina' ? 'Gasolina' : 
-                   car.fuelType === 'diesel' ? 'Diésel' : 
-                   car.fuelType === 'electrico' ? 'Eléctrico' : 'Híbrido'}
+                  {car.fuel_type === 'gasolina' ? 'Gasolina' :
+                   car.fuel_type === 'diesel' ? 'Diesel' :
+                   car.fuel_type === 'electrico' ? 'Electrico' : 'Hibrido'}
                 </span>
               </div>
               <div class="car-card__price">
-                <span class="price">${car.pricePerDay}</span>
-                <span class="period">/día</span>
+                <span class="price">${car.price_per_day}</span>
+                <span class="period">/dia</span>
               </div>
             </div>
           </a>
@@ -148,29 +101,6 @@ const stats = [
             <path d="M5 12h14M12 5l7 7-7 7"/>
           </svg>
         </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Banner de Promoción -->
-  <section class="promo-banner">
-    <div class="container">
-      <div class="promo-content">
-        <div class="promo-text">
-          <h2>Oferta Especial de Verano</h2>
-          <p>Obtén 20% de descuento en rentas de 7 días o más. ¡Aprovecha esta promoción limitada!</p>
-          <div class="promo-features">
-            <span>✓ Sin cargos ocultos</span>
-            <span>✓ Seguro incluido</span>
-            <span>✓ Kilometraje ilimitado</span>
-          </div>
-        </div>
-        <div class="promo-cta">
-          <a href="/catalogo" class="btn btn-promo">
-            Reservar Ahora
-          </a>
-          <small>Válido hasta el 30 de Agosto 2024</small>
-        </div>
       </div>
     </div>
   </section>

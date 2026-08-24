@@ -1,43 +1,76 @@
-# Astro Starter Kit: Minimal
+# Alex Renta Cars
+
+Sitio web y panel administrativo para publicar vehículos de alquiler, mostrar casos de importación y gestionar solicitudes de renta.
+
+## Tecnología
+
+- Astro 5 con renderizado SSR
+- Vercel
+- Supabase Database y Auth
+- Cloudinary opcional para subir imágenes
+- EmailJS para el formulario de contacto
+
+## Desarrollo local
 
 ```sh
-npm create astro@latest -- --template minimal
+npm install
+cp .env.example .env.local
+npm run dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Completa `.env.local` con los valores del proyecto. El archivo está ignorado por Git y nunca debe subirse.
 
-## 🚀 Project Structure
+## Variables
 
-Inside of your Astro project, you'll see the following folders and files:
+Obligatorias:
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+- `PUBLIC_SUPABASE_URL`
+- `PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+- `ADMIN_EMAILS`
+
+Opcionales:
+
+- `SUPABASE_SERVICE_ROLE_KEY`: solo para el script de creación de administradores
+- `ADMIN_USERS_JSON`: lista utilizada por `npm run seed:admins`
+- `CLOUDINARY_CLOUD_NAME`
+- `PUBLIC_CLOUDINARY_CLOUD_NAME`
+- `CLOUDINARY_API_KEY`
+- `CLOUDINARY_API_SECRET`
+- `CLOUDINARY_FOLDER`
+
+El `service role` y los secretos de Cloudinary son exclusivamente de servidor. Nunca deben usar el prefijo `PUBLIC_`.
+
+## Rutas principales
+
+- `/`: inicio
+- `/catalogo`: catálogo y filtros
+- `/catalogo/:id`: detalle y solicitud de renta
+- `/importaciones`: importaciones publicadas
+- `/contacto`: contacto
+- `/admin/login`: acceso administrativo
+- `/admin/dashboard`: resumen
+- `/admin/carros`: gestión de flota
+- `/admin/reservas`: gestión de importaciones
+- `/admin/solicitudes`: gestión de solicitudes
+
+## Base de datos
+
+El esquema reproducible está en `supabase-schema.sql`. Todas las tablas públicas tienen RLS habilitado. El público únicamente puede leer flota/importaciones y crear solicitudes pendientes; las operaciones administrativas exigen un usuario con `app_metadata.role = "admin"`.
+
+Para crear administradores de forma segura, exporta las variables del servidor y ejecuta:
+
+```sh
+npm run seed:admins
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+No guardes contraseñas dentro del repositorio.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+## Verificación y despliegue
 
-Any static assets, like images, can be placed in the `public/` directory.
+```sh
+npm run build
+```
 
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+La rama `master` está conectada al proyecto `alex-renta-cars` en Vercel. Un push a esa rama crea un despliegue de producción.

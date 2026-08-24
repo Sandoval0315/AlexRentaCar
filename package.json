@@ -6,12 +6,19 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "check": "astro check",
+    "seed:admins": "node scripts/create-admin-users.mjs"
   },
   "dependencies": {
-    "@astrojs/vercel": "^9.0.0",
-    "@emailjs/browser": "^4.4.1",
-    "astro": "^5.14.8",
-    "axios": "^1.12.2"
+    "@astrojs/vercel": "11.0.7",
+    "astro": "7.2.4"
+  },
+  "overrides": {
+    "path-to-regexp": "6.3.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.10",
+    "typescript": "5.9.3"
   }
 }

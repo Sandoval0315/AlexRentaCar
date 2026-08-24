@@ -1,0 +1,454 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { requireAdmin } from '../../lib/admin-auth.js';
+import { getPublicConfig, getRentals } from '../../lib/data.js';
+
+const session = await requireAdmin(Astro);
+if (session instanceof Response) return session;
+
+const rentals = await getRentals();
+const publicConfig = getPublicConfig();
+---
+
+<AdminLayout
+  title="Alquileres"
+  currentPath="/admin/carros"
+  sessionEmail={session.email}
+>
+  <section class="crud-grid">
+    <article class="editor-card">
+      <div class="editor-card__header">
+        <div>
+          <span class="eyebrow">Nuevo vehiculo</span>
+          <h2>Publicar alquiler</h2>
+        </div>
+        <span class={`chip ${publicConfig.cloudinaryCloudName ? 'chip--ok' : ''}`}>
+          {publicConfig.cloudinaryCloudName ? 'Cloudinary activo' : 'Solo URL manual'}
+        </span>
+      </div>
+
+      <form id="rental-form" class="editor-form">
+        <input type="hidden" name="id" />
+        <div class="form-grid">
+          <label>Marca<input name="brand" required /></label>
+          <label>Modelo<input name="model" required /></label>
+          <label>Anio<input name="year" type="number" min="1990" required /></label>
+          <label>Precio por dia<input name="price_per_day" type="number" min="0" required /></label>
+          <label>Categoria
+            <select name="category">
+              <option value="sedan">Sedan</option>
+              <option value="suv">SUV</option>
+              <option value="compacto">Compacto</option>
+              <option value="pickup">Pickup</option>
+              <option value="van">Van</option>
+            </select>
+          </label>
+          <label>Transmision
+            <select name="transmission">
+              <option value="automatica">Automatica</option>
+              <option value="manual">Manual</option>
+            </select>
+          </label>
+          <label>Asientos<input name="seats" type="number" min="2" required /></label>
+          <label>Combustible
+            <select name="fuel_type">
+              <option value="gasolina">Gasolina</option>
+              <option value="diesel">Diesel</option>
+              <option value="hibrido">Hibrido</option>
+              <option value="electrico">Electrico</option>
+            </select>
+          </label>
+          <label>Estado visible<input name="status" placeholder="Disponible, Reservado..." required /></label>
+          <label class="checkbox"><input name="available" type="checkbox" checked /> Disponible</label>
+          <label class="checkbox"><input name="featured" type="checkbox" /> Destacado</label>
+        </div>
+
+        <label>Descripcion<textarea name="description" rows="4"></textarea></label>
+        <label>Caracteristicas<textarea name="featuresText" rows="3" placeholder="Una por linea"></textarea></label>
+        <label>URLs de imagen<textarea name="imagesText" rows="3" placeholder="Una por linea"></textarea></label>
+        <label>Subir imagenes
+          <input id="rental-image-upload" type="file" accept="image/*" multiple />
+        </label>
+
+        <div class="form-actions">
+          <button type="submit">Guardar vehiculo</button>
+          <button type="button" class="button-secondary" id="rental-form-reset">Limpiar</button>
+        </div>
+        <p id="rental-form-message" class="form-message"></p>
+      </form>
+    </article>
+
+    <article class="list-card">
+      <div class="editor-card__header">
+        <div>
+          <span class="eyebrow">Listado actual</span>
+          <h2>Vehiculos</h2>
+        </div>
+        <strong id="rental-count">{rentals.length}</strong>
+      </div>
+
+      <div id="rental-list" class="list-stack"></div>
+    </article>
+  </section>
+
+  <script is:inline define:vars={{ initialRentals: rentals, publicConfig }}>
+    // @ts-nocheck -- Panel CRUD con datos serializados por Astro.
+    const rentals = [...initialRentals];
+    const form = document.getElementById('rental-form');
+    const list = document.getElementById('rental-list');
+    const count = document.getElementById('rental-count');
+    const message = document.getElementById('rental-form-message');
+    const resetButton = document.getElementById('rental-form-reset');
+    const uploadInput = document.getElementById('rental-image-upload');
+
+    const formatMoney = (value) => new Intl.NumberFormat('es-SV', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 0
+    }).format(Number(value || 0));
+
+    const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+    })[character]);
+
+    const safeImageUrl = (value) => {
+      const candidate = String(value || '');
+      if (candidate.startsWith('/')) return escapeHtml(candidate);
+      try {
+        const parsed = new URL(candidate);
+        return ['http:', 'https:'].includes(parsed.protocol)
+          ? escapeHtml(parsed.href)
+          : '/img/toyota-corolla-2023-1.jpg';
+      } catch {
+        return '/img/toyota-corolla-2023-1.jpg';
+      }
+    };
+
+    function resetForm() {
+      form.reset();
+      form.elements.id.value = '';
+      form.elements.available.checked = true;
+      message.textContent = '';
+    }
+
+    function itemCard(item) {
+      return `
+        <article class="fleet-item">
+          <img src="${safeImageUrl(item.images?.[0])}" alt="${escapeHtml(item.brand)} ${escapeHtml(item.model)}" />
+          <div class="fleet-item__body">
+            <div>
+              <strong>${escapeHtml(item.brand)} ${escapeHtml(item.model)}</strong>
+              <p>${escapeHtml(item.year)} · ${escapeHtml(item.status)}</p>
+            </div>
+            <span>${formatMoney(item.price_per_day)}/dia</span>
+          </div>
+          <div class="fleet-item__actions">
+            <button type="button" data-edit="${escapeHtml(item.id)}">Editar</button>
+            <button type="button" data-delete="${escapeHtml(item.id)}" class="danger">Eliminar</button>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderList() {
+      list.innerHTML = rentals.map(itemCard).join('');
+      count.textContent = String(rentals.length);
+    }
+
+    async function uploadFiles(files) {
+      if (!files.length) return [];
+      if (!publicConfig.cloudinaryCloudName) {
+        message.textContent = 'Cloudinary no esta completo. Usa URLs manuales o configura las variables del servidor.';
+        return [];
+      }
+
+      const urls = [];
+      for (const file of files) {
+        const payload = new FormData();
+        payload.append('file', file);
+
+        const response = await fetch('/api/admin/upload', {
+          method: 'POST',
+          body: payload
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error?.message || 'Error subiendo imagen.');
+        }
+        urls.push(data.secure_url);
+      }
+      return urls;
+    }
+
+    function fillForm(item) {
+      form.elements.id.value = item.id;
+      form.elements.brand.value = item.brand;
+      form.elements.model.value = item.model;
+      form.elements.year.value = item.year;
+      form.elements.price_per_day.value = item.price_per_day;
+      form.elements.category.value = item.category;
+      form.elements.transmission.value = item.transmission;
+      form.elements.seats.value = item.seats;
+      form.elements.fuel_type.value = item.fuel_type;
+      form.elements.status.value = item.status;
+      form.elements.available.checked = Boolean(item.available);
+      form.elements.featured.checked = Boolean(item.featured);
+      form.elements.description.value = item.description || '';
+      form.elements.featuresText.value = (item.features || []).join('\n');
+      form.elements.imagesText.value = (item.images || []).join('\n');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    form?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      message.textContent = 'Guardando...';
+
+      const data = new FormData(form);
+      const manualUrls = String(data.get('imagesText') || '')
+        .split('\n')
+        .map((item) => item.trim())
+        .filter(Boolean);
+
+      try {
+        const uploadedUrls = await uploadFiles(Array.from(uploadInput.files || []));
+        const payload = {
+          brand: String(data.get('brand') || ''),
+          model: String(data.get('model') || ''),
+          year: Number(data.get('year') || 0),
+          price_per_day: Number(data.get('price_per_day') || 0),
+          category: String(data.get('category') || 'sedan'),
+          transmission: String(data.get('transmission') || 'automatica'),
+          seats: Number(data.get('seats') || 5),
+          fuel_type: String(data.get('fuel_type') || 'gasolina'),
+          status: String(data.get('status') || 'Disponible'),
+          available: data.get('available') === 'on',
+          featured: data.get('featured') === 'on',
+          description: String(data.get('description') || ''),
+          features: String(data.get('featuresText') || '').split('\n').map((item) => item.trim()).filter(Boolean),
+          images: [...manualUrls, ...uploadedUrls]
+        };
+
+        const id = String(data.get('id') || '');
+        const response = await fetch(id ? `/api/admin/rentals/${id}` : '/api/admin/rentals', {
+          method: id ? 'PATCH' : 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const saved = await response.json();
+        if (!response.ok) {
+          throw new Error(saved.error || 'No se pudo guardar.');
+        }
+
+        const index = rentals.findIndex((item) => item.id === saved.id);
+        if (index >= 0) rentals[index] = saved;
+        else rentals.unshift(saved);
+        renderList();
+        resetForm();
+        message.textContent = 'Vehiculo guardado correctamente.';
+      } catch (error) {
+        message.textContent = error.message;
+      }
+    });
+
+    list?.addEventListener('click', async (event) => {
+      const editId = event.target.getAttribute('data-edit');
+      const deleteId = event.target.getAttribute('data-delete');
+
+      if (editId) {
+        const item = rentals.find((entry) => entry.id === editId);
+        if (item) fillForm(item);
+      }
+
+      if (deleteId) {
+        const confirmed = window.confirm('Eliminar este vehiculo del panel?');
+        if (!confirmed) return;
+
+        const response = await fetch(`/api/admin/rentals/${deleteId}`, { method: 'DELETE' });
+        if (!response.ok) {
+          message.textContent = 'No se pudo eliminar.';
+          return;
+        }
+        const index = rentals.findIndex((item) => item.id === deleteId);
+        rentals.splice(index, 1);
+        renderList();
+        message.textContent = 'Vehiculo eliminado.';
+      }
+    });
+
+    resetButton?.addEventListener('click', resetForm);
+    renderList();
+  </script>
+</AdminLayout>
+
+<style>
+  .crud-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 1rem;
+  }
+
+  .editor-card,
+  .list-card {
+    background: rgba(255, 255, 255, 0.82);
+    border-radius: 26px;
+    padding: 1.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 18px 50px rgba(15, 23, 42, 0.07);
+  }
+
+  .editor-card__header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .eyebrow {
+    display: block;
+    color: #dc2626;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.72rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .chip {
+    background: #111827;
+    color: #fff;
+    border-radius: 999px;
+    padding: 0.45rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .chip--ok {
+    background: #166534;
+  }
+
+  .editor-form,
+  .form-grid {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .editor-form label {
+    display: grid;
+    gap: 0.45rem;
+    color: #374151;
+    font-size: 0.92rem;
+  }
+
+  .editor-form input,
+  .editor-form select,
+  .editor-form textarea,
+  .fleet-item__actions button {
+    font: inherit;
+  }
+
+  .editor-form input,
+  .editor-form select,
+  .editor-form textarea {
+    border: 1px solid #d1d5db;
+    border-radius: 16px;
+    padding: 0.9rem 1rem;
+    background: #fff;
+  }
+
+  .checkbox {
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 0.7rem;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 0.8rem;
+  }
+
+  .form-actions button {
+    border: 0;
+    border-radius: 16px;
+    padding: 0.95rem 1.2rem;
+    background: linear-gradient(135deg, #dc2626, #f97316);
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .button-secondary {
+    background: #e5e7eb !important;
+    color: #111827 !important;
+  }
+
+  .form-message {
+    min-height: 1.5rem;
+    color: #dc2626;
+  }
+
+  .list-stack {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .fleet-item {
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr) auto;
+    gap: 0.9rem;
+    align-items: center;
+    background: #fff;
+    border-radius: 22px;
+    padding: 0.75rem;
+  }
+
+  .fleet-item img {
+    width: 92px;
+    height: 92px;
+    object-fit: cover;
+    border-radius: 18px;
+  }
+
+  .fleet-item__body p {
+    color: #6b7280;
+  }
+
+  .fleet-item__actions {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .fleet-item__actions button {
+    border: 0;
+    border-radius: 999px;
+    padding: 0.7rem 0.9rem;
+    background: #111827;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  .fleet-item__actions .danger {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  @media (max-width: 900px) {
+    .crud-grid,
+    .form-grid,
+    .fleet-item {
+      grid-template-columns: 1fr;
+    }
+
+    .fleet-item img {
+      width: 100%;
+      height: 180px;
+    }
+
+    .fleet-item__actions {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

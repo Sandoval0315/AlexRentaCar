@@ -1,0 +1,79 @@
+<footer class="site-footer">
+  <div class="site-footer__grid">
+    <div>
+      <img src="/logos/logotexto.png" alt="Alex Renta Cars" />
+      <p>Renta de vehículos e importaciones con atención personalizada en El Salvador.</p>
+    </div>
+
+    <nav aria-label="Enlaces del pie de página">
+      <a href="/catalogo">Catálogo</a>
+      <a href="/importaciones">Importaciones</a>
+      <a href="/about">Nosotros</a>
+      <a href="/contacto">Contacto</a>
+    </nav>
+
+    <div class="site-footer__contact">
+      <a href="tel:+50322758900">+503 2275-8900</a>
+      <a href="mailto:info@alexrentacars.com">info@alexrentacars.com</a>
+      <a href="https://wa.me/50379856321" target="_blank" rel="noreferrer">WhatsApp</a>
+    </div>
+  </div>
+  <p class="site-footer__legal">© {new Date().getFullYear()} Alex Renta Cars. Todos los derechos reservados.</p>
+</footer>
+
+<style>
+  .site-footer {
+    padding: 3rem 1.25rem 1.5rem;
+    background: #111827;
+    color: #e5e7eb;
+  }
+
+  .site-footer__grid {
+    max-width: 1180px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.4fr 0.8fr 1fr;
+    gap: 2rem;
+  }
+
+  .site-footer img {
+    width: min(210px, 100%);
+    height: auto;
+  }
+
+  .site-footer p {
+    max-width: 420px;
+    line-height: 1.7;
+    color: #9ca3af;
+  }
+
+  .site-footer nav,
+  .site-footer__contact {
+    display: grid;
+    align-content: start;
+    gap: 0.75rem;
+  }
+
+  .site-footer a {
+    color: #f9fafb;
+    text-decoration: none;
+  }
+
+  .site-footer a:hover {
+    color: #fb923c;
+  }
+
+  .site-footer__legal {
+    max-width: 1180px !important;
+    margin: 2rem auto 0;
+    padding-top: 1.25rem;
+    border-top: 1px solid #374151;
+    font-size: 0.85rem;
+  }
+
+  @media (max-width: 720px) {
+    .site-footer__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

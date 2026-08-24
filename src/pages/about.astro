@@ -6,27 +6,27 @@ import HeroAboutSection from '../components/HeroAboutSection.astro';
 // Datos de la galería
 const galleryImages = [
   {
-    src: "/img/about-gallery-1.jpg",
+    src: "/img/toyota-corolla-2023-1.jpg",
     alt: "Nuestra flota de vehículos"
   },
   {
-    src: "/img/about-gallery-2.jpg",
+    src: "/img/honda-cr1.jpg",
     alt: "Atención al cliente personalizada"
   },
   {
-    src: "/img/about-gallery-3.jpg",
+    src: "/img/ford-explorer1.jpg",
     alt: "Instalaciones modernas"
   },
   {
-    src: "/img/about-gallery-4.jpg",
+    src: "/img/hyundai_tucson_2023_1.jpeg",
     alt: "Equipo de trabajo"
   },
   {
-    src: "/img/about-gallery-5.jpg",
+    src: "/img/centra2023-1.jpg",
     alt: "Servicio de mantenimiento"
   },
   {
-    src: "/img/about-gallery-6.jpg",
+    src: "/img/spark1.jpg",
     alt: "Clientes satisfechos"
   }
 ];
@@ -36,19 +36,19 @@ const teamMembers = [
   {
     name: "Alex Rodríguez",
     position: "Fundador & CEO",
-    image: "/img/team-alex.jpg",
+    image: "/logos/logoicono.png",
     description: "Más de 10 años de experiencia en la industria automotriz"
   },
   {
     name: "María Hernández",
     position: "Gerente de Operaciones",
-    image: "/img/team-maria.jpg",
+    image: "/logos/logoicono.png",
     description: "Especialista en servicio al cliente y logística"
   },
   {
     name: "Carlos Martínez",
     position: "Jefe de Flota",
-    image: "/img/team-carlos.jpg",
+    image: "/logos/logoicono.png",
     description: "Encargado del mantenimiento y calidad de vehículos"
   }
 ];
@@ -131,7 +131,7 @@ const companyValues = [
         
         <div class="about-image">
           <img 
-            src="/img/about-history.jpg" 
+            src="/img/hyundai_tucson_2023_1.jpeg"
             alt="Historia de Alex Renta Cars"
             class="history-image"
           />
@@ -157,7 +157,6 @@ const companyValues = [
           poster="/img/video-poster.png"
         >
           <source src="/videos/toyota2023.mp4" type="video/mp4">
-          <source src="/videos/corporativo.webm" type="video/webm">
           Tu navegador no soporta el elemento video.
         </video>
         <div class="video-overlay">
@@ -182,7 +181,7 @@ const companyValues = [
       </div>
       
       <div class="values-grid">
-        {companyValues.map((value, index) => (
+        {companyValues.map((value) => (
           <div class="value-card">
             <div class="value-icon">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
@@ -208,7 +207,7 @@ const companyValues = [
       </div>
       
       <div class="gallery-grid">
-        {galleryImages.map((image, index) => (
+        {galleryImages.map((image) => (
           <div class="gallery-item">
             <img 
               src={image.src} 
@@ -236,7 +235,7 @@ const companyValues = [
       </div>
       
       <div class="team-grid">
-        {teamMembers.map((member, index) => (
+        {teamMembers.map((member) => (
           <div class="team-card">
             <div class="team-image">
               <img 
@@ -758,6 +757,7 @@ const companyValues = [
 </style>
 
 <script>
+  // @ts-nocheck -- Controles nativos de video en el navegador.
   // Script para controlar el video
   document.addEventListener('DOMContentLoaded', function() {
     const video = document.querySelector('.corporate-video');

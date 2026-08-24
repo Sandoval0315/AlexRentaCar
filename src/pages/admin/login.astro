@@ -1,0 +1,172 @@
+---
+import { readAdminSession } from '../../lib/admin-auth.js';
+
+if (await readAdminSession(Astro.cookies)) {
+  return Astro.redirect('/admin/dashboard');
+}
+---
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login - Alex Renta Cars</title>
+</head>
+<body class="admin-login-body">
+  <main class="admin-login">
+    <section class="admin-login__panel">
+      <a href="/" class="admin-login__back">Volver al sitio</a>
+      <span class="admin-login__eyebrow">Acceso privado</span>
+      <h1>Panel de administracion</h1>
+      <p>Ingresa con una cuenta admin autorizada en Supabase para gestionar alquileres, solicitudes e importaciones.</p>
+
+      <form id="admin-login-form" class="admin-login__form">
+        <label>
+          Correo
+          <input type="email" name="email" autocomplete="username" required />
+        </label>
+        <label>
+          Contrasena
+          <input type="password" name="password" autocomplete="current-password" required />
+        </label>
+
+        <button type="submit">Entrar</button>
+        <p class="admin-login__hint">El acceso se valida con Supabase Auth y la lista de admins autorizados.</p>
+        <p id="admin-login-error" class="admin-login__error"></p>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    // @ts-nocheck -- Formulario de autenticación en el navegador.
+    const form = document.getElementById('admin-login-form');
+    const errorBox = document.getElementById('admin-login-error');
+
+    form?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      errorBox.textContent = '';
+
+      const formData = new FormData(form);
+      const payload = Object.fromEntries(formData.entries());
+
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        errorBox.textContent = data.error || 'No se pudo iniciar sesion.';
+        return;
+      }
+
+      window.location.href = '/admin/dashboard';
+    });
+  </script>
+</body>
+</html>
+
+<style>
+  .admin-login-body {
+                background-image: url('https://asipi.org/elsalvador2025/wp-content/uploads/sites/34/2025/02/Centro-Historico-de-San-Salvador-Vista-Aerea-09.jpg ');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Lexend', 'Segoe UI', sans-serif;
+    color: #fff;
+  }
+
+  .admin-login {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+  }
+
+  .admin-login__panel {
+    width: min(100%, 420px);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(20px);
+    border-radius: 28px;
+    padding: 2rem;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+  }
+
+  .admin-login__back,
+  .admin-login__eyebrow,
+  .admin-login__hint {
+    display: block;
+  }
+
+  .admin-login__back {
+    color: #fdba74;
+    text-decoration: none;
+    margin-bottom: 1rem;
+  }
+
+  .admin-login__eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-size: 0.72rem;
+    color: #fecaca;
+    margin-bottom: 0.8rem;
+  }
+
+  .admin-login h1 {
+    margin: 0 0 0.75rem;
+    font-size: clamp(2rem, 6vw, 2.6rem);
+  }
+
+  .admin-login p {
+    color: #e5e7eb;
+  }
+
+  .admin-login__form {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .admin-login__form label {
+    display: grid;
+    gap: 0.45rem;
+    font-size: 0.95rem;
+  }
+
+  .admin-login__form input {
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    padding: 0.95rem 1rem;
+    background: rgba(17, 24, 39, 0.55);
+    color: #fff;
+    font: inherit;
+  }
+
+  .admin-login__form button {
+    border: 0;
+    border-radius: 16px;
+    padding: 1rem;
+    background: linear-gradient(135deg, #dc2626, #f97316);
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .admin-login__hint {
+    font-size: 0.82rem;
+    color: #d1d5db;
+  }
+
+  .admin-login__error {
+    min-height: 1.4rem;
+    color: #fca5a5;
+    margin: 0;
+  }
+</style>

@@ -1,14 +1,14 @@
 ---
 export interface Car {
-  _id: string;
+  id: string;
   brand: string;
   model: string;
   year: number;
-  pricePerDay: number;
+  price_per_day: number;
   category: string;
   transmission: string;
   seats: number;
-  fuelType: string;
+  fuel_type: string;
   features: string[];
   images: string[];
   available: boolean;
@@ -22,7 +22,7 @@ interface Props {
 const { car } = Astro.props;
 ---
 
-<a href={`/catalogo/${car._id}`} class="car-card">
+<a href={`/catalogo/${car.id}`} class="car-card">
   <div class="car-card__image-container">
     <img 
       src={car.images[0] || '/images/car-placeholder.jpg'} 
@@ -44,8 +44,8 @@ const { car } = Astro.props;
         <span class="car-card__year">{car.year}</span>
       </div>
       <div class="car-card__price">
-        <span class="car-card__price-amount">${car.pricePerDay}</span>
-        <span class="car-card__price-period">/día</span>
+        <span class="car-card__price-amount">${car.price_per_day}</span>
+        <span class="car-card__price-period">/dia</span>
       </div>
     </div>
 
@@ -63,7 +63,7 @@ const { car } = Astro.props;
           </svg>
         </div>
         <span class="car-card__spec-text">
-          {car.transmission === 'automatica' ? 'Automática' : 'Manual'}
+          {car.transmission === 'automatica' ? 'Automatica' : 'Manual'}
         </span>
       </div>
 
@@ -83,9 +83,9 @@ const { car } = Astro.props;
           </svg>
         </div>
         <span class="car-card__spec-text">
-          {car.fuelType === 'gasolina' ? 'Gasolina' : 
-           car.fuelType === 'diesel' ? 'Diésel' : 
-           car.fuelType === 'electrico' ? 'Eléctrico' : 'Híbrido'}
+          {car.fuel_type === 'gasolina' ? 'Gasolina' :
+           car.fuel_type === 'diesel' ? 'Diesel' :
+           car.fuel_type === 'electrico' ? 'Electrico' : 'Hibrido'}
         </span>
       </div>
     </div>

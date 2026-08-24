@@ -1,0 +1,216 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { requireAdmin } from '../../lib/admin-auth.js';
+import { getRentalRequests } from '../../lib/data.js';
+
+const session = await requireAdmin(Astro);
+if (session instanceof Response) return session;
+
+const requests = await getRentalRequests(session.accessToken);
+---
+
+<AdminLayout
+  title="Solicitudes de renta"
+  currentPath="/admin/solicitudes"
+  sessionEmail={session.email}
+>
+  <section class="requests-panel">
+    <div class="requests-panel__header">
+      <div>
+        <span class="eyebrow">Rentas entrantes</span>
+        <h2>Solicitudes por confirmar</h2>
+      </div>
+      <strong id="request-count">{requests.length}</strong>
+    </div>
+
+    <div id="request-list" class="request-list"></div>
+    <p id="request-message" class="request-message"></p>
+  </section>
+
+  <script is:inline define:vars={{ initialRequests: requests }}>
+    // @ts-nocheck -- Panel CRUD con datos serializados por Astro.
+    const requests = [...initialRequests];
+    const list = document.getElementById('request-list');
+    const count = document.getElementById('request-count');
+    const message = document.getElementById('request-message');
+
+    const formatMoney = (value) => new Intl.NumberFormat('es-SV', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 0
+    }).format(Number(value || 0));
+
+    const formatDate = (value) => value
+      ? new Intl.DateTimeFormat('es-SV', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(value))
+      : 'Sin fecha';
+
+    const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+    })[character]);
+
+    function render() {
+      list.innerHTML = requests.map((item) => `
+        <article class="request-card">
+          <div class="request-card__main">
+            <div>
+              <strong>${escapeHtml(item.customer_name)}</strong>
+              <p>${escapeHtml(item.customer_email)} · ${escapeHtml(item.customer_phone)}</p>
+            </div>
+            <span class="status">${escapeHtml(item.status)}</span>
+          </div>
+          <div class="request-card__details">
+            <span>${escapeHtml(item.rental_snapshot?.brand || '')} ${escapeHtml(item.rental_snapshot?.model || '')} ${escapeHtml(item.rental_snapshot?.year || '')}</span>
+            <span>${formatDate(item.start_date)} - ${formatDate(item.end_date)}</span>
+            <span>${formatMoney(item.total_estimate)}</span>
+          </div>
+          ${item.notes ? `<p class="request-card__notes">${escapeHtml(item.notes)}</p>` : ''}
+          <div class="request-card__actions">
+            <button type="button" data-status="confirmada" data-id="${escapeHtml(item.id)}">Confirmar</button>
+            <button type="button" data-status="cancelada" data-id="${escapeHtml(item.id)}" class="button-secondary">Cancelar</button>
+            <button type="button" data-delete="${escapeHtml(item.id)}" class="danger">Eliminar</button>
+          </div>
+        </article>
+      `).join('');
+      count.textContent = String(requests.length);
+    }
+
+    async function updateStatus(id, status) {
+      const response = await fetch(`/api/admin/rental-requests/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'No se pudo actualizar.');
+
+      const index = requests.findIndex((item) => item.id === id);
+      if (index >= 0) requests[index] = data;
+      render();
+    }
+
+    list?.addEventListener('click', async (event) => {
+      const status = event.target.getAttribute('data-status');
+      const statusId = event.target.getAttribute('data-id');
+      const deleteId = event.target.getAttribute('data-delete');
+
+      try {
+        if (status && statusId) {
+          await updateStatus(statusId, status);
+          message.textContent = 'Solicitud actualizada.';
+        }
+
+        if (deleteId) {
+          const confirmed = window.confirm('Eliminar esta solicitud?');
+          if (!confirmed) return;
+
+          const response = await fetch(`/api/admin/rental-requests/${deleteId}`, { method: 'DELETE' });
+          if (!response.ok) throw new Error('No se pudo eliminar.');
+          const index = requests.findIndex((item) => item.id === deleteId);
+          if (index >= 0) requests.splice(index, 1);
+          render();
+          message.textContent = 'Solicitud eliminada.';
+        }
+      } catch (error) {
+        message.textContent = error.message;
+      }
+    });
+
+    render();
+  </script>
+</AdminLayout>
+
+<style>
+  .requests-panel {
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 26px;
+    padding: 1.25rem;
+    box-shadow: 0 18px 50px rgba(15, 23, 42, 0.07);
+  }
+
+  .requests-panel__header,
+  .request-card__main,
+  .request-card__actions,
+  .request-card__details {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .requests-panel__header,
+  .request-card__main {
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .eyebrow {
+    display: block;
+    color: #dc2626;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.72rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .request-list {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .request-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 1rem;
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .request-card p {
+    color: #6b7280;
+    margin: 0.25rem 0 0;
+  }
+
+  .request-card__details {
+    flex-wrap: wrap;
+    color: #374151;
+  }
+
+  .status {
+    background: #111827;
+    color: #fff;
+    border-radius: 999px;
+    padding: 0.4rem 0.7rem;
+    font-size: 0.78rem;
+  }
+
+  .request-card__actions button {
+    border: 0;
+    border-radius: 999px;
+    padding: 0.75rem 1rem;
+    background: #166534;
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .request-card__actions .button-secondary {
+    background: #e5e7eb;
+    color: #111827;
+  }
+
+  .request-card__actions .danger {
+    background: #dc2626;
+  }
+
+  .request-message {
+    min-height: 1.4rem;
+    color: #dc2626;
+  }
+
+  @media (max-width: 720px) {
+    .request-card__main,
+    .request-card__actions {
+      display: grid;
+    }
+  }
+</style>

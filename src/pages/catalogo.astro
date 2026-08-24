@@ -1,127 +1,34 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
-import CarCard from '../components/CarCard.astro';
+import { getRentals } from '../lib/data.js';
 
-// Datos de ejemplo (reemplazar con datos reales de tu API)
-const cars = [
-  {
-    _id: "1",
-    brand: "Toyota",
-    model: "Corolla",
-    year: 2023,
-    pricePerDay: 45,
-    category: "sedan",
-    transmission: "automatica",
-    seats: 5,
-    fuelType: "gasolina",
-    features: ["Aire Acondicionado", "Bluetooth", "Cámara de Retroceso"],
-    images: ["/img/toyota-corolla-2023-1.jpg"],
-    available: true,
-    description: "Sedán confiable y económico para viajes de negocios o placer."
-  },
-  {
-    _id: "2",
-    brand: "Honda",
-    model: "CR-V",
-    year: 2024,
-    pricePerDay: 65,
-    category: "suv",
-    transmission: "automatica",
-    seats: 5,
-    fuelType: "hibrido",
-    features: ["GPS", "Asientos de Cuero", "Sensores de Estacionamiento"],
-    images: ["/img/honda-cr1.jpg"],
-    available: true,
-    description: "SUV espacioso y eficiente para la familia."
-  },
-  {
-    _id: "3",
-    brand: "Nissan",
-    model: "Sentra",
-    year: 2023,
-    pricePerDay: 40,
-    category: "sedan",
-    transmission: "automatica",
-    seats: 5,
-    fuelType: "gasolina",
-    features: ["Control Crucero", "Apple CarPlay", "Android Auto"],
-    images: ["/img/centra2023-1.jpg"],
-    available: false,
-    description: "Sedán compacto con excelente rendimiento de combustible."
-  },
-  {
-    _id: "4",
-    brand: "Ford",
-    model: "Explorer",
-    year: 2024,
-    pricePerDay: 75,
-    category: "suv",
-    transmission: "automatica",
-    seats: 7,
-    fuelType: "gasolina",
-    features: ["Tercera Fila", "Sistema de Sonido Premium", "Control de Tracción"],
-    images: ["/img/ford-explorer1.jpg"],
-    available: true,
-    description: "SUV familiar con capacidad para 7 pasajeros."
-  },
-  {
-    _id: "5",
-    brand: "Hyundai",
-    model: "Tucson",
-    year: 2023,
-    pricePerDay: 55,
-    category: "suv",
-    transmission: "automatica",
-    seats: 5,
-    fuelType: "gasolina",
-    features: ["Techo Panorámico", "Asientos Calefaccionados", "Asistente de Carril"],
-    images: ["/img/hyundai_tucson_2023_1.jpeg"],
-    available: true,
-    description: "SUV versátil con tecnología avanzada."
-  },
-  {
-    _id: "6",
-    brand: "Chevrolet",
-    model: "Spark",
-    year: 2023,
-    pricePerDay: 30,
-    category: "compacto",
-    transmission: "manual",
-    seats: 4,
-    fuelType: "gasolina",
-    features: ["Aire Acondicionado", "Radio Bluetooth", "Bajo Consumo"],
-    images: ["/img/spark1.jpg"],
-    available: true,
-    description: "Compacto económico perfecto para la ciudad."
-  }
-];
+const allCars = await getRentals();
+const searchQuery = String(Astro.url.searchParams.get('search') || '').trim().toLowerCase();
+const cars = searchQuery
+  ? allCars.filter((car) => `${car.brand} ${car.model} ${car.year} ${car.category}`.toLowerCase().includes(searchQuery))
+  : allCars;
 ---
 
-<MainLayout title="Catálogo - Alex Renta Cars">
+<MainLayout title="Catalogo - Alex Renta Cars">
   <section class="catalog">
     <div class="catalog__container">
-      <!-- Header del Catálogo -->
       <div class="catalog__header">
-        <h1 class="catalog__title">Nuestra Flota de Vehículos</h1>
+        <h1 class="catalog__title">Nuestra flota disponible</h1>
         <p class="catalog__subtitle">
-          Descubre nuestra amplia selección de vehículos para todas tus necesidades
+          Los vehiculos de esta pagina salen del admin para que puedas publicar, editar o quitar
+          unidades sin tocar codigo.
         </p>
-        
-        <!-- Botón para mostrar/ocultar filtros en móviles -->
-        <button class="catalog__filters-toggle" id="filters-toggle">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/>
-          </svg>
-          Filtros
+
+        <button class="catalog__filters-toggle" id="filters-toggle" type="button">
+          Mostrar filtros
         </button>
 
-        <!-- Filtros -->
         <div class="catalog__filters" id="filters-container">
           <div class="filter-group">
-            <label for="category" class="filter-label">Categoría</label>
+            <label for="category" class="filter-label">Categoria</label>
             <select id="category" class="filter-select">
-              <option value="">Todas las categorías</option>
-              <option value="sedan">Sedán</option>
+              <option value="">Todas</option>
+              <option value="sedan">Sedan</option>
               <option value="suv">SUV</option>
               <option value="compacto">Compacto</option>
               <option value="deportivo">Deportivo</option>
@@ -129,381 +36,310 @@ const cars = [
               <option value="pickup">Pickup</option>
             </select>
           </div>
-          
           <div class="filter-group">
-            <label for="transmission" class="filter-label">Transmisión</label>
+            <label for="transmission" class="filter-label">Transmision</label>
             <select id="transmission" class="filter-select">
-              <option value="">Cualquier transmisión</option>
-              <option value="automatica">Automática</option>
+              <option value="">Cualquiera</option>
+              <option value="automatica">Automatica</option>
               <option value="manual">Manual</option>
             </select>
           </div>
-          
           <div class="filter-group">
-            <label for="price" class="filter-label">Precio máximo</label>
+            <label for="price" class="filter-label">Precio maximo</label>
             <select id="price" class="filter-select">
-              <option value="">Cualquier precio</option>
-              <option value="30">Hasta $30/día</option>
-              <option value="50">Hasta $50/día</option>
-              <option value="70">Hasta $70/día</option>
-              <option value="100">Hasta $100/día</option>
+              <option value="">Sin limite</option>
+              <option value="35">Hasta $35/dia</option>
+              <option value="50">Hasta $50/dia</option>
+              <option value="70">Hasta $70/dia</option>
+              <option value="100">Hasta $100/dia</option>
             </select>
           </div>
-
-          <button class="filters-apply" id="apply-filters">
-            Aplicar Filtros
-          </button>
+          <button class="filters-apply" id="apply-filters" type="button">Aplicar</button>
         </div>
       </div>
 
-      <!-- Grid de Vehículos -->
-      <div class="catalog__grid">
+      <div class="catalog__grid" id="catalog-grid">
         {cars.map((car) => (
-          <CarCard car={car} />
+          <a href={`/catalogo/${car.id}`} class="catalog-card">
+            <div class="catalog-card__image">
+              <img src={car.images[0] || '/img/toyota-corolla-2023-1.jpg'} alt={`${car.brand} ${car.model}`} />
+              {!car.available && <span>No disponible</span>}
+            </div>
+            <div class="catalog-card__content">
+              <div class="catalog-card__top">
+                <div>
+                  <h2>{car.brand} {car.model}</h2>
+                  <p>{car.year} · {car.category}</p>
+                </div>
+                <strong>${car.price_per_day}<small>/dia</small></strong>
+              </div>
+              <div class="catalog-card__specs">
+                <span>{car.transmission}</span>
+                <span>{car.seats} asientos</span>
+                <span>{car.fuel_type}</span>
+              </div>
+              <p class="catalog-card__description">{car.description}</p>
+            </div>
+          </a>
         ))}
       </div>
-
-      <!-- Mensaje si no hay vehículos -->
-      {cars.length === 0 && (
-        <div class="catalog__empty">
-          <h3>No se encontraron vehículos</h3>
-          <p>Intenta ajustar los filtros para ver más opciones</p>
-        </div>
-      )}
+      {cars.length === 0 && <p class="catalog__empty">No encontramos vehículos con ese criterio.</p>}
     </div>
   </section>
+
+  <script is:inline define:vars={{ cars }}>
+    // @ts-nocheck -- Datos serializados por Astro para filtros del navegador.
+    const source = [...cars];
+    const grid = document.getElementById('catalog-grid');
+    const category = document.getElementById('category');
+    const transmission = document.getElementById('transmission');
+    const price = document.getElementById('price');
+    const filtersContainer = document.getElementById('filters-container');
+    const filtersToggle = document.getElementById('filters-toggle');
+    const applyButton = document.getElementById('apply-filters');
+
+    const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+    })[character]);
+
+    const safeImageUrl = (value) => {
+      const candidate = String(value || '');
+      if (candidate.startsWith('/')) return escapeHtml(candidate);
+      try {
+        const parsed = new URL(candidate);
+        return ['http:', 'https:'].includes(parsed.protocol)
+          ? escapeHtml(parsed.href)
+          : '/img/toyota-corolla-2023-1.jpg';
+      } catch {
+        return '/img/toyota-corolla-2023-1.jpg';
+      }
+    };
+
+    function render(items) {
+      grid.innerHTML = items.map((car) => `
+        <a href="/catalogo/${encodeURIComponent(car.id)}" class="catalog-card">
+          <div class="catalog-card__image">
+            <img src="${safeImageUrl(car.images?.[0])}" alt="${escapeHtml(car.brand)} ${escapeHtml(car.model)}" />
+            ${car.available ? '' : '<span>No disponible</span>'}
+          </div>
+          <div class="catalog-card__content">
+            <div class="catalog-card__top">
+              <div>
+                <h2>${escapeHtml(car.brand)} ${escapeHtml(car.model)}</h2>
+                <p>${escapeHtml(car.year)} · ${escapeHtml(car.category)}</p>
+              </div>
+              <strong>$${escapeHtml(car.price_per_day)}<small>/dia</small></strong>
+            </div>
+            <div class="catalog-card__specs">
+              <span>${escapeHtml(car.transmission)}</span>
+              <span>${escapeHtml(car.seats)} asientos</span>
+              <span>${escapeHtml(car.fuel_type)}</span>
+            </div>
+            <p class="catalog-card__description">${escapeHtml(car.description || '')}</p>
+          </div>
+        </a>
+      `).join('');
+    }
+
+    function applyFilters() {
+      const items = source.filter((car) => {
+        const byCategory = !category.value || car.category === category.value;
+        const byTransmission = !transmission.value || car.transmission === transmission.value;
+        const byPrice = !price.value || Number(car.price_per_day) <= Number(price.value);
+        return byCategory && byTransmission && byPrice;
+      });
+      render(items);
+    }
+
+    filtersToggle?.addEventListener('click', () => {
+      filtersContainer?.classList.toggle('is-open');
+    });
+
+    applyButton?.addEventListener('click', applyFilters);
+  </script>
 </MainLayout>
 
 <style>
   .catalog {
-    padding: 4rem 0;
+    padding: 3rem 0 4rem;
     min-height: 80vh;
   }
 
   .catalog__container {
-    max-width: 1400px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 0 2rem;
+    padding: 0 1.25rem;
   }
 
   .catalog__header {
     text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
   }
 
   .catalog__title {
-    font-family: 'Lexend', sans-serif;
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 1rem;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    margin-bottom: 0.9rem;
   }
 
   .catalog__subtitle {
-    font-family: 'Lexend', sans-serif;
-    font-size: 1.1rem;
+    max-width: 700px;
+    margin: 0 auto 1.4rem;
     color: #6b7280;
-    max-width: 600px;
-    margin: 0 auto 2rem;
-    line-height: 1.6;
   }
 
-  /* Botón toggle para filtros en móviles */
   .catalog__filters-toggle {
     display: none;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    background: #dc2626;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-family: 'Lexend', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    margin: 0 auto 1.5rem;
-    transition: all 0.3s ease;
-  }
-
-  .catalog__filters-toggle:hover {
-    background: #b91c1c;
-    transform: translateY(-1px);
+    border: 0;
+    border-radius: 999px;
+    background: #111827;
+    color: #fff;
+    padding: 0.9rem 1.1rem;
+    font: inherit;
+    font-weight: 700;
   }
 
   .catalog__filters {
     display: flex;
     justify-content: center;
-    gap: 1.5rem;
+    gap: 0.85rem;
     flex-wrap: wrap;
-    transition: all 0.3s ease;
   }
 
   .filter-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    min-width: 160px;
-  }
-
-  .filter-label {
-    font-family: 'Lexend', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: #374151;
+    display: grid;
+    gap: 0.45rem;
     text-align: left;
   }
 
-  .filter-select {
-    padding: 0.75rem 1rem;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    background: white;
-    font-family: 'Lexend', sans-serif;
-    font-size: 0.9rem;
+  .filter-label {
+    font-size: 0.85rem;
     color: #374151;
-    transition: all 0.3s ease;
-    cursor: pointer;
   }
 
-  .filter-select:focus {
-    outline: none;
-    border-color: #dc2626;
-    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+  .filter-select,
+  .filters-apply {
+    border: 1px solid #d1d5db;
+    border-radius: 16px;
+    padding: 0.85rem 1rem;
+    background: #fff;
+    font: inherit;
   }
 
   .filters-apply {
-    display: none;
-    padding: 0.75rem 1.5rem;
-    background: #dc2626;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-family: 'Lexend', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 600;
+    border: 0;
+    background: linear-gradient(135deg, #dc2626, #f97316);
+    color: #fff;
+    align-self: end;
     cursor: pointer;
-    transition: all 0.3s ease;
-    align-self: flex-end;
-    margin-top: 1.5rem;
-  }
-
-  .filters-apply:hover {
-    background: #b91c1c;
-    transform: translateY(-1px);
+    font-weight: 700;
   }
 
   .catalog__grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
   }
 
-  .catalog__empty {
-    text-align: center;
-    padding: 4rem 2rem;
+  .catalog-card {
+    display: block;
+    background: #fff;
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 20px 55px rgba(15, 23, 42, 0.09);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .catalog-card__image {
+    position: relative;
+    height: 220px;
+  }
+
+  .catalog-card__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .catalog-card__image span {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    border-radius: 999px;
+    background: rgba(17, 24, 39, 0.85);
+    color: #fff;
+    font-size: 0.78rem;
+    padding: 0.45rem 0.7rem;
+  }
+
+  .catalog-card__content {
+    padding: 1.2rem;
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .catalog-card__top {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .catalog-card__top p,
+  .catalog-card__description {
     color: #6b7280;
   }
 
-  .catalog__empty h3 {
-    font-family: 'Lexend', sans-serif;
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    color: #374151;
+  .catalog-card__top strong {
+    color: #dc2626;
+    font-size: 1.4rem;
   }
 
-  /* === RESPONSIVE DESIGN === */
+  .catalog-card__top small {
+    font-size: 0.78rem;
+    color: #9ca3af;
+    display: block;
+    text-align: right;
+  }
 
-  /* Tablets */
-  @media (max-width: 1024px) {
+  .catalog-card__specs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+  }
+
+  .catalog-card__specs span {
+    background: #f3f4f6;
+    padding: 0.45rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+  }
+
+  @media (max-width: 900px) {
     .catalog__grid {
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .catalog__filters {
-      gap: 1.25rem;
-    }
-
-    .filter-group {
-      min-width: 140px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
-  /* Tablets pequeñas y móviles */
   @media (max-width: 768px) {
-    .catalog {
-      padding: 3rem 0;
-    }
-
-    .catalog__container {
-      padding: 0 1.5rem;
-    }
-
-    .catalog__title {
-      font-size: 2rem;
-    }
-
-    .catalog__subtitle {
-      font-size: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    /* Mostrar botón toggle en móviles */
     .catalog__filters-toggle {
-      display: flex;
+      display: inline-flex;
+      margin-bottom: 1rem;
     }
 
-    /* Ocultar filtros por defecto en móviles */
     .catalog__filters {
       display: none;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 1rem;
-      background: white;
-      padding: 1.5rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      border: 1px solid #e5e7eb;
-      margin-bottom: 2rem;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 20px;
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
     }
 
-    .catalog__filters.active {
-      display: flex;
-    }
-
-    .filter-group {
-      min-width: auto;
-    }
-
-    .filter-label {
-      text-align: left;
-    }
-
-    .filter-select {
-      width: 100%;
-    }
-
-    /* Mostrar botón aplicar en móviles */
-    .filters-apply {
-      display: block;
-    }
-
-    .catalog__grid {
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.25rem;
-    }
-  }
-
-  /* Móviles */
-  @media (max-width: 480px) {
-    .catalog__container {
-      padding: 0 1rem;
-    }
-
-    .catalog__title {
-      font-size: 1.75rem;
-    }
-
-    .catalog__filters {
-      padding: 1.25rem;
+    .catalog__filters.is-open {
+      display: grid;
     }
 
     .catalog__grid {
       grid-template-columns: 1fr;
-      gap: 1rem;
-    }
-
-    .filter-select {
-      padding: 0.875rem 1rem;
-    }
-  }
-
-  /* Móviles pequeños */
-  @media (max-width: 360px) {
-    .catalog__container {
-      padding: 0 0.75rem;
-    }
-
-    .catalog__title {
-      font-size: 1.5rem;
-    }
-
-    .catalog__filters-toggle {
-      width: 100%;
-      justify-content: center;
-    }
-
-    .catalog__filters {
-      padding: 1rem;
     }
   }
 </style>
-
-<script is:inline>
-  document.addEventListener('DOMContentLoaded', function() {
-    const filtersToggle = document.getElementById('filters-toggle');
-    const filtersContainer = document.getElementById('filters-container');
-    const applyFiltersBtn = document.getElementById('apply-filters');
-
-    // Toggle de filtros en móviles
-    if (filtersToggle && filtersContainer) {
-      filtersToggle.addEventListener('click', function() {
-        filtersContainer.classList.toggle('active');
-        
-        // Cambiar texto del botón
-        if (filtersContainer.classList.contains('active')) {
-          this.innerHTML = `
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-            </svg>
-            Cerrar Filtros
-          `;
-        } else {
-          this.innerHTML = `
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/>
-            </svg>
-            Filtros
-          `;
-        }
-      });
-    }
-
-    // Aplicar filtros en móviles
-    if (applyFiltersBtn) {
-      applyFiltersBtn.addEventListener('click', function() {
-        // Aquí iría la lógica para aplicar los filtros
-        console.log('Aplicando filtros...');
-        
-        // Cerrar el panel de filtros después de aplicar
-        if (filtersContainer.classList.contains('active')) {
-          filtersToggle.click();
-        }
-      });
-    }
-
-    // Cerrar filtros al hacer clic fuera en móviles
-    document.addEventListener('click', function(event) {
-      if (window.innerWidth <= 768 && 
-          filtersContainer && 
-          filtersContainer.classList.contains('active') &&
-          !filtersContainer.contains(event.target) &&
-          !filtersToggle.contains(event.target)) {
-        filtersToggle.click();
-      }
-    });
-
-    // Manejar cambios en los selects (filtrado automático en desktop)
-    const filterSelects = document.querySelectorAll('.filter-select');
-    filterSelects.forEach(select => {
-      select.addEventListener('change', function() {
-        if (window.innerWidth > 768) {
-          // En desktop, aplicar filtros automáticamente
-          console.log('Filtrando en desktop...');
-          // Aquí iría la lógica de filtrado
-        }
-      });
-    });
-  });
-</script>

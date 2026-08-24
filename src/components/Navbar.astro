@@ -8,7 +8,7 @@ const currentPath = Astro.url.pathname;
         <a href="/" class="navbar__logo">
             <div class="navbar__logo-placeholder">
                 <img
-                    src="/logos/logo-blanco.png"
+                    src="/logos/logoicono.png"
                     alt="Logo de Alex Renta Cars"
                     class="navbar__logo-image"
                 />
@@ -25,7 +25,12 @@ const currentPath = Astro.url.pathname;
             <a
                 href="/catalogo"
                 class={`navbar__nav-item ${currentPath === "/catalogo" || currentPath.startsWith("/catalogo/") ? "active" : ""}`}
-                >Catálogo</a
+                >Alquiler</a
+            >
+            <a
+                href="/importaciones"
+                class={`navbar__nav-item ${currentPath === "/importaciones" || currentPath.startsWith("/importaciones/") ? "active" : ""}`}
+                >Importaciones</a
             >
             <a
                 href="/about"
@@ -66,7 +71,7 @@ const currentPath = Astro.url.pathname;
             </div>
 
             <!-- Login Button (Desktop) - Solo un botón -->
-            <a href="/login" class="navbar__login-btn">
+            <a href="/admin/login" class="navbar__login-btn">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
                     <polyline points="10 17 15 12 10 7"/>
@@ -106,6 +111,11 @@ const currentPath = Astro.url.pathname;
                 >Catálogo</a
             >
             <a
+                href="/importaciones"
+                class={`navbar__mobile-item ${currentPath === "/importaciones" ? "active" : ""}`}
+                >Importaciones</a
+            >
+            <a
                 href="/about"
                 class={`navbar__mobile-item ${currentPath === "/about" ? "active" : ""}`}
                 >Nosotros</a
@@ -117,7 +127,7 @@ const currentPath = Astro.url.pathname;
             >
 
             <!-- Mobile Login Button -->
-            <a href="/login" class="navbar__mobile-login-btn">
+            <a href="/admin/login" class="navbar__mobile-login-btn">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
                     <polyline points="10 17 15 12 10 7"/>
@@ -128,6 +138,7 @@ const currentPath = Astro.url.pathname;
 
             <div class="navbar__mobile-search">
                 <input
+                    id="mobile-search-input"
                     type="text"
                     placeholder="Buscar..."
                     class="navbar__mobile-search-input"
@@ -204,8 +215,8 @@ const currentPath = Astro.url.pathname;
     }
 
     .navbar__logo-placeholder {
-        width: 45px !important;
-        height: 45px !important;
+        width: 90px !important;
+        height: 65px !important;
         border-radius: 6px !important;
         display: flex !important;
         align-items: center !important;
@@ -215,7 +226,7 @@ const currentPath = Astro.url.pathname;
     }
 
     .navbar__logo:hover .navbar__logo-placeholder {
-        transform: rotate(-5deg) scale(1.05) !important;
+        transform: scale(1) scale(1.05) !important;
     }
 
     .navbar__logo-image {
@@ -593,6 +604,7 @@ const currentPath = Astro.url.pathname;
 </style>
 
 <script is:inline>
+    // @ts-nocheck -- Script de navegador sin dependencias.
     document.addEventListener("DOMContentLoaded", function () {
         const navbar = document.getElementById("navbar");
         const mobileToggle = document.getElementById("mobile-toggle");
@@ -651,6 +663,7 @@ const currentPath = Astro.url.pathname;
         // Búsqueda
         const searchBtn = document.getElementById("search-btn");
         const searchInput = document.getElementById("search-input");
+        const mobileSearchInput = document.getElementById("mobile-search-input");
         
         if (searchBtn && searchInput) {
             const performSearch = () => {
@@ -667,5 +680,12 @@ const currentPath = Astro.url.pathname;
                 }
             });
         }
+
+        mobileSearchInput?.addEventListener("keypress", (event) => {
+            if (event.key === "Enter") {
+                const query = mobileSearchInput.value.trim();
+                if (query) window.location.href = `/catalogo?search=${encodeURIComponent(query)}`;
+            }
+        });
     });
 </script>

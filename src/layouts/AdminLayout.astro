@@ -1,0 +1,238 @@
+---
+import '../styles/global.css';
+
+const { title = 'Admin Alex Renta Cars', currentPath = '/admin/dashboard', sessionEmail = '' } = Astro.props;
+
+const navItems = [
+  { href: '/admin/dashboard', label: 'Dashboard' },
+  { href: '/admin/carros', label: 'Alquileres' },
+  { href: '/admin/solicitudes', label: 'Solicitudes' },
+  { href: '/admin/reservas', label: 'Importaciones' }
+];
+---
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title}</title>
+  <link rel="icon" type="image/x-icon" href="/logos/logoicono.png" />
+</head>
+<body class="admin-body">
+  <div class="admin-shell">
+    <aside class="admin-sidebar">
+      <a href="/" class="admin-brand">
+        <img src="/logos/logoicono.png" alt="Alex Renta Cars" />
+        <div>
+          <strong>Alex Renta Cars</strong>
+          <span>Panel admin</span>
+        </div>
+      </a>
+
+      <nav class="admin-nav">
+        {navItems.map((item) => (
+          <a href={item.href} class={`admin-nav__link ${currentPath === item.href ? 'is-active' : ''}`}>
+            {item.label}
+          </a>
+        ))}
+      </nav>
+
+      <div class="admin-sidebar__footer">
+        <p>{sessionEmail}</p>
+        <button class="admin-logout" type="button" id="admin-logout">
+          Cerrar sesion
+        </button>
+      </div>
+    </aside>
+
+    <div class="admin-main">
+      <header class="admin-topbar">
+        <button type="button" class="admin-menu" id="admin-menu">Menu</button>
+        <div>
+          <p class="admin-topbar__eyebrow">Operacion diaria</p>
+          <h1>{title}</h1>
+        </div>
+      </header>
+
+      <main class="admin-content">
+        <slot />
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // @ts-nocheck -- Script de navegador sin dependencias.
+    const sidebar = document.querySelector('.admin-sidebar');
+    const menuButton = document.getElementById('admin-menu');
+    const logoutButton = document.getElementById('admin-logout');
+
+    menuButton?.addEventListener('click', () => {
+      sidebar?.classList.toggle('is-open');
+    });
+
+    logoutButton?.addEventListener('click', async () => {
+      await fetch('/api/admin/logout', { method: 'POST' });
+      window.location.href = '/admin/login';
+    });
+  </script>
+</body>
+</html>
+
+<style>
+  .admin-body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at top left, rgba(220, 38, 38, 0.14), transparent 28%),
+      linear-gradient(180deg, #fff8f5 0%, #f3f4f6 52%, #eef2ff 100%);
+    color: #111827;
+    font-family: 'Lexend', 'Segoe UI', sans-serif;
+  }
+
+  .admin-shell {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+  }
+
+  .admin-sidebar {
+    background: rgba(15, 23, 42, 0.97);
+    color: #fff;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+
+  .admin-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .admin-brand img {
+    width: 52px;
+    height: 52px;
+    object-fit: cover;
+    border-radius: 14px;
+  }
+
+  .admin-brand strong,
+  .admin-brand span {
+    display: block;
+  }
+
+  .admin-brand span {
+    color: #94a3b8;
+    font-size: 0.88rem;
+  }
+
+  .admin-nav {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .admin-nav__link {
+    text-decoration: none;
+    color: #cbd5e1;
+    padding: 0.95rem 1rem;
+    border-radius: 16px;
+    background: rgba(148, 163, 184, 0.08);
+    transition: 0.2s ease;
+  }
+
+  .admin-nav__link.is-active,
+  .admin-nav__link:hover {
+    color: #fff;
+    background: linear-gradient(135deg, #dc2626, #f97316);
+    transform: translateY(-1px);
+  }
+
+  .admin-sidebar__footer {
+    margin-top: auto;
+    display: grid;
+    gap: 0.9rem;
+    color: #94a3b8;
+    font-size: 0.9rem;
+  }
+
+  .admin-logout,
+  .admin-menu {
+    border: 0;
+    border-radius: 999px;
+    background: #fff;
+    color: #111827;
+    padding: 0.8rem 1rem;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .admin-main {
+    padding: 1.25rem;
+  }
+
+  .admin-topbar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .admin-menu {
+    display: none;
+  }
+
+  .admin-topbar__eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.7rem;
+    color: #dc2626;
+    margin-bottom: 0.3rem;
+  }
+
+  .admin-topbar h1 {
+    font-size: clamp(1.6rem, 2vw, 2.2rem);
+  }
+
+  .admin-content {
+    display: grid;
+    gap: 1rem;
+  }
+
+  @media (max-width: 900px) {
+    .admin-shell {
+      grid-template-columns: 1fr;
+    }
+
+    .admin-sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      width: min(82vw, 280px);
+      transform: translateX(-100%);
+      transition: transform 0.25s ease;
+      z-index: 30;
+    }
+
+    .admin-sidebar.is-open {
+      transform: translateX(0);
+    }
+
+    .admin-main {
+      padding: 1rem;
+    }
+
+    .admin-menu {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 12px 25px rgba(15, 23, 42, 0.08);
+    }
+  }
+</style>

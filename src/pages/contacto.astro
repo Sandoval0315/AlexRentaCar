@@ -69,7 +69,7 @@ const faqs = [
           </div>
 
           <div class="contact-methods">
-            {contactInfo.map((item, index) => (
+            {contactInfo.map((item) => (
               <div class="contact-method">
                 <div class="method-icon">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -79,8 +79,8 @@ const faqs = [
                 <div class="method-content">
                   <h3>{item.title}</h3>
                   <div class="method-details">
-                    {item.details.map((detail, i) => (
-                      <span key={i}>{detail}</span>
+                    {item.details.map((detail) => (
+                      <span>{detail}</span>
                     ))}
                   </div>
                   {item.link && (
@@ -100,17 +100,17 @@ const faqs = [
           <div class="social-section">
             <h3>Síguenos en redes sociales</h3>
             <div class="social-links">
-              <a href="#" class="social-link" aria-label="Facebook">
+              <a href="/contacto" class="social-link" aria-label="Facebook no configurado" hidden>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                 </svg>
               </a>
-              <a href="#" class="social-link" aria-label="Instagram">
+              <a href="/contacto" class="social-link" aria-label="Instagram no configurado" hidden>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.62 5.367 11.987 11.988 11.987s11.987-5.367 11.987-11.987C24.014 5.367 18.647.001 12.017.001zM8.449 16.988c-1.297 0-2.448-.611-3.197-1.558-.749-.947-1.011-2.165-.703-3.415.308-1.25 1.167-2.289 2.343-2.792 1.175-.503 2.518-.412 3.614.246 1.096.658 1.819 1.822 1.945 3.104.126 1.282-.357 2.538-1.311 3.395-.954.857-2.256 1.22-3.491 1.02zm8.062 0c-.517 0-1.01-.104-1.465-.307-1.213-.56-2.038-1.784-2.038-3.182 0-.83.304-1.624.857-2.241.553-.617 1.312-.998 2.143-1.064.83-.066 1.645.189 2.297.703.652.514 1.073 1.249 1.173 2.055.1.806-.13 1.614-.637 2.247-.507.633-1.238 1.025-2.033 1.089-.133.011-.267.017-.401.017z"/>
                 </svg>
               </a>
-              <a href="#" class="social-link" aria-label="WhatsApp">
+              <a href="https://wa.me/50379856321" class="social-link" aria-label="WhatsApp" target="_blank" rel="noreferrer">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893-.001-3.189-1.262-6.209-3.553-8.485"/>
                 </svg>
@@ -223,7 +223,7 @@ const faqs = [
       </div>
 
       <div class="faq-grid">
-        {faqs.map((faq, index) => (
+        {faqs.map((faq) => (
           <div class="faq-item">
             <div class="faq-question">
               <h3>{faq.question}</h3>
@@ -774,6 +774,7 @@ const faqs = [
 </style>
 
 <script>
+  // @ts-nocheck -- EmailJS se carga dinámicamente en el navegador.
   // Configuración de EmailJS
   const EMAILJS_CONFIG = {
     SERVICE_ID: 'service_eergcby',
