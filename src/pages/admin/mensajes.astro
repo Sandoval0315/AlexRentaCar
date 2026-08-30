@@ -1,0 +1,190 @@
+---
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { requireAdmin } from '../../lib/admin-auth.js';
+import { getContactMessages } from '../../lib/data.js';
+
+const session = await requireAdmin(Astro);
+if (session instanceof Response) return session;
+
+const messages = await getContactMessages(session.accessToken);
+---
+
+<AdminLayout title="Mensajes" currentPath="/admin/mensajes" sessionEmail={session.email}>
+  <section class="messages-panel">
+    <header class="messages-panel__header">
+      <div>
+        <span>Contacto público</span>
+        <h2>Mensajes recibidos</h2>
+      </div>
+      <strong id="message-count">{messages.length}</strong>
+    </header>
+
+    <div id="message-list" class="message-list"></div>
+    <p id="action-message" class="action-message"></p>
+  </section>
+
+  <script is:inline define:vars={{ initialMessages: messages }}>
+    // @ts-nocheck -- Interfaz administrativa con datos serializados por Astro.
+    const messages = [...initialMessages];
+    const list = document.getElementById('message-list');
+    const count = document.getElementById('message-count');
+    const actionMessage = document.getElementById('action-message');
+
+    const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+    })[character]);
+
+    const formatDate = (value) => new Intl.DateTimeFormat('es-SV', {
+      dateStyle: 'medium',
+      timeStyle: 'short'
+    }).format(new Date(value));
+
+    const statusLabel = {
+      nuevo: 'Nuevo',
+      en_proceso: 'En proceso',
+      resuelto: 'Resuelto'
+    };
+
+    function render() {
+      list.innerHTML = messages.length
+        ? messages.map((item) => `
+          <article class="message-card">
+            <div class="message-card__header">
+              <div>
+                <strong>${escapeHtml(item.name)}</strong>
+                <p>${escapeHtml(item.email)} · ${escapeHtml(item.phone)}</p>
+              </div>
+              <span class="status status--${escapeHtml(item.status)}">${statusLabel[item.status] || escapeHtml(item.status)}</span>
+            </div>
+            <div class="message-card__meta">
+              <span>${escapeHtml(item.subject || 'general')}</span>
+              <time>${formatDate(item.created_at)}</time>
+            </div>
+            <p class="message-card__body">${escapeHtml(item.message)}</p>
+            <div class="message-card__actions">
+              <a href="mailto:${encodeURIComponent(item.email)}">Responder por correo</a>
+              <a href="tel:${encodeURIComponent(item.phone)}" class="button-secondary">Llamar</a>
+              <button type="button" data-status="en_proceso" data-id="${escapeHtml(item.id)}">En proceso</button>
+              <button type="button" data-status="resuelto" data-id="${escapeHtml(item.id)}" class="button-success">Resolver</button>
+              <button type="button" data-delete="${escapeHtml(item.id)}" class="danger">Eliminar</button>
+            </div>
+          </article>
+        `).join('')
+        : '<p class="empty-state">Todavía no hay mensajes recibidos.</p>';
+      count.textContent = String(messages.length);
+    }
+
+    async function updateStatus(id, status) {
+      const response = await fetch(`/api/admin/contact-messages/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'No se pudo actualizar.');
+      const index = messages.findIndex((item) => item.id === id);
+      if (index >= 0) messages[index] = data;
+    }
+
+    list?.addEventListener('click', async (event) => {
+      const target = event.target;
+      const id = target.getAttribute('data-id');
+      const status = target.getAttribute('data-status');
+      const deleteId = target.getAttribute('data-delete');
+
+      try {
+        if (id && status) {
+          await updateStatus(id, status);
+          actionMessage.textContent = 'Mensaje actualizado.';
+        }
+
+        if (deleteId) {
+          if (!window.confirm('¿Eliminar este mensaje?')) return;
+          const response = await fetch(`/api/admin/contact-messages/${deleteId}`, { method: 'DELETE' });
+          if (!response.ok) throw new Error('No se pudo eliminar.');
+          const index = messages.findIndex((item) => item.id === deleteId);
+          if (index >= 0) messages.splice(index, 1);
+          actionMessage.textContent = 'Mensaje eliminado.';
+        }
+        render();
+      } catch (error) {
+        actionMessage.textContent = error.message;
+      }
+    });
+
+    render();
+  </script>
+</AdminLayout>
+
+<style>
+  .messages-panel {
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 26px;
+    padding: 1.25rem;
+    box-shadow: 0 18px 50px rgba(15, 23, 42, 0.07);
+  }
+
+  .messages-panel__header,
+  .message-card__header,
+  .message-card__meta,
+  .message-card__actions {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .messages-panel__header span {
+    color: #dc2626;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.72rem;
+  }
+
+  .message-list {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .message-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 1rem;
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .message-card p { margin: 0.25rem 0 0; color: #6b7280; }
+  .message-card__meta { color: #6b7280; font-size: 0.82rem; }
+  .message-card__body { white-space: pre-wrap; color: #374151 !important; }
+  .message-card__actions { justify-content: flex-start; flex-wrap: wrap; }
+
+  .message-card__actions a,
+  .message-card__actions button {
+    border: 0;
+    border-radius: 999px;
+    padding: 0.72rem 0.95rem;
+    background: #111827;
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .message-card__actions .button-secondary { background: #e5e7eb; color: #111827; }
+  .message-card__actions .button-success { background: #166534; }
+  .message-card__actions .danger { background: #dc2626; }
+
+  .status { border-radius: 999px; padding: 0.4rem 0.7rem; background: #111827; color: #fff; font-size: 0.78rem; }
+  .status--nuevo { background: #b45309; }
+  .status--resuelto { background: #166534; }
+  .empty-state { text-align: center; padding: 2rem; color: #6b7280; }
+  .action-message { min-height: 1.4rem; color: #dc2626; }
+
+  @media (max-width: 720px) {
+    .message-card__header,
+    .message-card__meta { display: grid; }
+  }
+</style>

@@ -167,6 +167,7 @@ function normalizeImport(item) {
 function normalizeRentalRequest(item) {
   return {
     id: item.id || crypto.randomUUID?.() || String(Date.now()),
+    request_code: item.request_code || '',
     rental_id: item.rental_id || '',
     customer_name: item.customer_name || '',
     customer_email: item.customer_email || '',
@@ -177,7 +178,22 @@ function normalizeRentalRequest(item) {
     status: item.status || 'pendiente',
     total_estimate: Number(item.total_estimate || 0),
     rental_snapshot: item.rental_snapshot || null,
-    created_at: item.created_at || new Date().toISOString()
+    created_at: item.created_at || new Date().toISOString(),
+    updated_at: item.updated_at || item.created_at || new Date().toISOString()
+  };
+}
+
+function normalizeContactMessage(item) {
+  return {
+    id: item.id || crypto.randomUUID?.() || String(Date.now()),
+    name: item.name || '',
+    email: item.email || '',
+    phone: item.phone || '',
+    subject: item.subject || 'general',
+    message: item.message || '',
+    status: item.status || 'nuevo',
+    created_at: item.created_at || new Date().toISOString(),
+    updated_at: item.updated_at || item.created_at || new Date().toISOString()
   };
 }
 
@@ -292,8 +308,9 @@ export async function getRentals() {
   try {
     const rows = await supabaseRequest('rentals?select=*&order=created_at.desc');
     return rows.map(normalizeRental);
-  } catch {
-    return fallbackRentals.map(normalizeRental);
+  } catch (error) {
+    console.error('No se pudieron cargar los alquileres desde Supabase.', error);
+    return [];
   }
 }
 
@@ -315,8 +332,9 @@ export async function getImports() {
   try {
     const rows = await supabaseRequest('imports?select=*&order=created_at.desc');
     return rows.map(normalizeImport);
-  } catch {
-    return fallbackImports.map(normalizeImport);
+  } catch (error) {
+    console.error('No se pudieron cargar las importaciones desde Supabase.', error);
+    return [];
   }
 }
 
@@ -461,12 +479,94 @@ export async function createRentalRequest(payload) {
     return normalizeRentalRequest(cleanPayload);
   }
 
-  await supabaseRequest('rental_requests', {
+  const rows = await supabaseRequest('rpc/create_rental_request', {
     method: 'POST',
-    body: cleanPayload,
-    returnRepresentation: false
+    body: {
+      p_rental_id: cleanPayload.rental_id,
+      p_customer_name: cleanPayload.customer_name,
+      p_customer_email: cleanPayload.customer_email,
+      p_customer_phone: cleanPayload.customer_phone,
+      p_start_date: cleanPayload.start_date,
+      p_end_date: cleanPayload.end_date,
+      p_notes: cleanPayload.notes
+    }
   });
-  return normalizeRentalRequest(cleanPayload);
+  return normalizeRentalRequest({ ...cleanPayload, ...(rows?.[0] || {}) });
+}
+
+export async function lookupRentalRequest(requestCode, customerEmail) {
+  const code = String(requestCode || '').trim();
+  const email = String(customerEmail || '').trim().toLowerCase();
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(code) || !isValidEmail(email)) {
+    throw new Error('El codigo o el correo no son validos.');
+  }
+
+  if (!hasSupabase()) return null;
+  const rows = await supabaseRequest('rpc/lookup_rental_request', {
+    method: 'POST',
+    body: { p_request_code: code, p_customer_email: email }
+  });
+  return rows?.[0] ? normalizeRentalRequest(rows[0]) : null;
+}
+
+export async function createContactMessage(payload) {
+  const cleanPayload = {
+    name: String(payload.name || '').trim().slice(0, 120),
+    email: String(payload.email || '').trim().toLowerCase().slice(0, 254),
+    phone: String(payload.phone || '').trim().slice(0, 40),
+    subject: String(payload.subject || 'general').trim().slice(0, 80),
+    message: String(payload.message || '').trim().slice(0, 3000),
+    status: 'nuevo'
+  };
+
+  if (cleanPayload.name.length < 2 || !isValidEmail(cleanPayload.email) || cleanPayload.phone.length < 7 || cleanPayload.message.length < 5) {
+    throw new Error('Completa correctamente los datos de contacto.');
+  }
+  if (!hasSupabase()) throw new Error('El servicio de mensajes no esta disponible.');
+
+  const rows = await supabaseRequest('rpc/submit_contact_message', {
+    method: 'POST',
+    body: {
+      p_name: cleanPayload.name,
+      p_email: cleanPayload.email,
+      p_phone: cleanPayload.phone,
+      p_subject: cleanPayload.subject,
+      p_message: cleanPayload.message
+    }
+  });
+  return normalizeContactMessage({ ...cleanPayload, ...(rows?.[0] || {}) });
+}
+
+export async function getContactMessages(accessToken) {
+  if (!hasSupabase()) return [];
+  const rows = await supabaseRequest('contact_messages?select=*&order=created_at.desc', {
+    admin: true,
+    token: accessToken
+  });
+  return rows.map(normalizeContactMessage);
+}
+
+export async function updateContactMessage(id, payload, accessToken) {
+  const allowedStatuses = new Set(['nuevo', 'en_proceso', 'resuelto']);
+  const status = String(payload.status || '');
+  if (!allowedStatuses.has(status)) throw new Error('Estado de mensaje no valido.');
+
+  const rows = await supabaseRequest(`contact_messages?id=eq.${id}`, {
+    method: 'PATCH',
+    body: { status },
+    admin: true,
+    token: accessToken
+  });
+  return normalizeContactMessage(rows[0]);
+}
+
+export async function deleteContactMessage(id, accessToken) {
+  await supabaseRequest(`contact_messages?id=eq.${id}`, {
+    method: 'DELETE',
+    admin: true,
+    token: accessToken
+  });
+  return { success: true };
 }
 
 export async function updateRentalRequest(id, payload, accessToken) {
@@ -502,7 +602,12 @@ export async function deleteRentalRequest(id, accessToken) {
 }
 
 export async function getDashboardSummary(accessToken) {
-  const [rentals, imports, rentalRequests] = await Promise.all([getRentals(), getImports(), getRentalRequests(accessToken)]);
+  const [rentals, imports, rentalRequests, contactMessages] = await Promise.all([
+    getRentals(),
+    getImports(),
+    getRentalRequests(accessToken),
+    getContactMessages(accessToken)
+  ]);
   return {
     rentalsTotal: rentals.length,
     rentalsAvailable: rentals.filter((item) => item.available).length,
@@ -512,9 +617,12 @@ export async function getDashboardSummary(accessToken) {
     importsInTransit: imports.filter((item) => item.status.toLowerCase() !== 'entregado').length,
     rentalRequestsTotal: rentalRequests.length,
     rentalRequestsPending: rentalRequests.filter((item) => item.status === 'pendiente').length,
+    contactMessagesTotal: contactMessages.length,
+    contactMessagesNew: contactMessages.filter((item) => item.status === 'nuevo').length,
     recentRentals: rentals.slice(0, 5),
     recentImports: imports.slice(0, 5),
-    recentRentalRequests: rentalRequests.slice(0, 5)
+    recentRentalRequests: rentalRequests.slice(0, 5),
+    recentContactMessages: contactMessages.slice(0, 5)
   };
 }
 

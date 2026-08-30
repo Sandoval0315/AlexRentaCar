@@ -31,15 +31,23 @@ export async function supabaseRequest(path, { method = 'GET', body, admin = fals
   }
 
   const apiKey = admin && serviceRoleKey ? serviceRoleKey : anonKey;
-  const authorization = token || apiKey;
+  const headers = {
+    apikey: apiKey,
+    'Content-Type': 'application/json',
+    Prefer: returnRepresentation ? 'return=representation' : 'return=minimal'
+  };
+
+  // Las claves sb_publishable_/sb_secret_ no son JWT. Solo los tokens de
+  // usuario (o las claves legacy basadas en JWT) deben ir como Bearer.
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  } else if (!apiKey.startsWith('sb_')) {
+    headers.Authorization = `Bearer ${apiKey}`;
+  }
+
   const response = await fetch(`${url}/rest/v1/${path}`, {
     method,
-    headers: {
-      apikey: apiKey,
-      Authorization: `Bearer ${authorization}`,
-      'Content-Type': 'application/json',
-      Prefer: returnRepresentation ? 'return=representation' : 'return=minimal'
-    },
+    headers,
     body: body ? JSON.stringify(body) : undefined
   });
 
@@ -104,13 +112,17 @@ export async function createAuthUser({ email, password, fullName, role = 'admin'
     throw new Error('SUPABASE_SERVICE_ROLE_KEY es requerido para crear usuarios.');
   }
 
+  const headers = {
+    apikey: serviceRoleKey,
+    'Content-Type': 'application/json'
+  };
+  if (!serviceRoleKey.startsWith('sb_')) {
+    headers.Authorization = `Bearer ${serviceRoleKey}`;
+  }
+
   const response = await fetch(`${url}/auth/v1/admin/users`, {
     method: 'POST',
-    headers: {
-      apikey: serviceRoleKey,
-      Authorization: `Bearer ${serviceRoleKey}`,
-      'Content-Type': 'application/json'
-    },
+    headers,
     body: JSON.stringify({
       email,
       password,

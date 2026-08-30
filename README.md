@@ -4,7 +4,7 @@ Sitio web y panel administrativo para publicar vehículos de alquiler, mostrar c
 
 ## Tecnología
 
-- Astro 5 con renderizado SSR
+- Astro 7 con renderizado SSR
 - Vercel
 - Supabase Database y Auth
 - Cloudinary opcional para subir imágenes
@@ -49,15 +49,24 @@ El `service role` y los secretos de Cloudinary son exclusivamente de servidor. N
 - `/catalogo/:id`: detalle y solicitud de renta
 - `/importaciones`: importaciones publicadas
 - `/contacto`: contacto
+- `/solicitud`: consulta pública del estado de una solicitud
 - `/admin/login`: acceso administrativo
 - `/admin/dashboard`: resumen
 - `/admin/carros`: gestión de flota
 - `/admin/reservas`: gestión de importaciones
 - `/admin/solicitudes`: gestión de solicitudes
+- `/admin/mensajes`: mensajes enviados desde el sitio público
 
 ## Base de datos
 
-El esquema reproducible está en `supabase-schema.sql`. Todas las tablas públicas tienen RLS habilitado. El público únicamente puede leer flota/importaciones y crear solicitudes pendientes; las operaciones administrativas exigen un usuario con `app_metadata.role = "admin"`.
+El esquema reproducible está en `supabase-schema.sql` y los cambios incrementales están en `supabase/migrations`. Todas las tablas públicas tienen RLS habilitado. El público puede leer flota/importaciones y usar funciones controladas para crear o consultar sus propias solicitudes y enviar mensajes. Las tablas con datos personales no permiten lectura pública; las operaciones administrativas exigen un usuario con `app_metadata.role = "admin"`.
+
+Los flujos conectados son:
+
+- Un vehículo guardado en el admin aparece en inicio (si está destacado), catálogo y detalle.
+- Una importación guardada en el admin aparece en `/importaciones`.
+- Una solicitud pública aparece en `/admin/solicitudes`; el cliente consulta los cambios con su código y correo.
+- Un mensaje de contacto aparece en `/admin/mensajes` aunque la notificación opcional de EmailJS falle.
 
 Para crear administradores de forma segura, exporta las variables del servidor y ejecuta:
 

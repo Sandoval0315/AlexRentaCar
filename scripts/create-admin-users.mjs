@@ -18,11 +18,14 @@ for (const admin of admins) {
 }
 
 async function supabaseFetch(path, options = {}) {
+  const authHeaders = serviceRoleKey.startsWith('sb_')
+    ? {}
+    : { Authorization: `Bearer ${serviceRoleKey}` };
   const response = await fetch(`${supabaseUrl}${path}`, {
     ...options,
     headers: {
       apikey: serviceRoleKey,
-      Authorization: `Bearer ${serviceRoleKey}`,
+      ...authHeaders,
       'Content-Type': 'application/json',
       Prefer: 'resolution=merge-duplicates,return=representation',
       ...options.headers

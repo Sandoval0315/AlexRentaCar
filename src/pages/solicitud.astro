@@ -1,0 +1,131 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+
+const initialCode = Astro.url.searchParams.get('codigo') || '';
+---
+
+<MainLayout title="Consultar solicitud - Alex Renta Cars">
+  <section class="tracking">
+    <div class="tracking__container">
+      <div class="tracking__intro">
+        <span>Seguimiento en línea</span>
+        <h1>Consulta tu solicitud de renta</h1>
+        <p>Ingresa el código recibido al solicitar el vehículo y el mismo correo que utilizaste en el formulario.</p>
+      </div>
+
+      <form id="tracking-form" class="tracking__form">
+        <label>
+          Código de solicitud
+          <input name="requestCode" value={initialCode} autocomplete="off" required />
+        </label>
+        <label>
+          Correo electrónico
+          <input name="customerEmail" type="email" autocomplete="email" required />
+        </label>
+        <button type="submit">Consultar estado</button>
+        <p id="tracking-message" class="tracking__message"></p>
+      </form>
+
+      <article id="tracking-result" class="tracking__result" hidden></article>
+    </div>
+  </section>
+
+  <script>
+    // @ts-nocheck -- Formulario público de seguimiento.
+    const form = document.getElementById('tracking-form');
+    const message = document.getElementById('tracking-message');
+    const result = document.getElementById('tracking-result');
+
+    const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+    })[character]);
+
+    const formatMoney = (value) => new Intl.NumberFormat('es-SV', {
+      style: 'currency', currency: 'USD'
+    }).format(Number(value || 0));
+
+    const formatDate = (value) => new Intl.DateTimeFormat('es-SV', {
+      day: '2-digit', month: 'long', year: 'numeric', timeZone: 'UTC'
+    }).format(new Date(`${value}T00:00:00Z`));
+
+    const labels = {
+      pendiente: 'Pendiente de confirmación',
+      confirmada: 'Reserva confirmada',
+      cancelada: 'Solicitud cancelada',
+      completada: 'Renta completada'
+    };
+
+    form?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      message.textContent = 'Consultando...';
+      result.hidden = true;
+
+      try {
+        const payload = Object.fromEntries(new FormData(form).entries());
+        const response = await fetch('/api/rental-requests/status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'No se pudo consultar.');
+
+        const vehicle = data.rental_snapshot || {};
+        result.innerHTML = `
+          <div class="tracking__status tracking__status--${escapeHtml(data.status)}">${labels[data.status] || escapeHtml(data.status)}</div>
+          <h2>${escapeHtml(vehicle.brand)} ${escapeHtml(vehicle.model)} ${escapeHtml(vehicle.year)}</h2>
+          <dl>
+            <div><dt>Inicio</dt><dd>${formatDate(data.start_date)}</dd></div>
+            <div><dt>Fin</dt><dd>${formatDate(data.end_date)}</dd></div>
+            <div><dt>Estimado</dt><dd>${formatMoney(data.total_estimate)}</dd></div>
+          </dl>
+          <p>Última actualización: ${new Intl.DateTimeFormat('es-SV', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(data.updated_at))}</p>
+        `;
+        result.hidden = false;
+        message.textContent = '';
+      } catch (error) {
+        message.textContent = error.message;
+      }
+    });
+  </script>
+</MainLayout>
+
+<style>
+  .tracking {
+    min-height: 75vh;
+    padding: 5rem 1.25rem;
+    background: radial-gradient(circle at top left, rgba(249, 115, 22, 0.14), transparent 30%), #f8fafc;
+  }
+
+  .tracking__container { max-width: 760px; margin: 0 auto; }
+  .tracking__intro { text-align: center; margin-bottom: 2rem; }
+  .tracking__intro span { color: #dc2626; text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.75rem; }
+  .tracking__intro h1 { font-size: clamp(2.2rem, 6vw, 3.8rem); margin: 0.7rem 0; }
+  .tracking__intro p { color: #64748b; max-width: 620px; margin: 0 auto; }
+
+  .tracking__form,
+  .tracking__result {
+    background: #fff;
+    border-radius: 26px;
+    padding: 1.5rem;
+    box-shadow: 0 20px 55px rgba(15, 23, 42, 0.09);
+  }
+
+  .tracking__form { display: grid; gap: 1rem; }
+  .tracking__form label { display: grid; gap: 0.45rem; font-weight: 600; color: #374151; }
+  .tracking__form input { border: 1px solid #d1d5db; border-radius: 14px; padding: 0.9rem 1rem; font: inherit; }
+  .tracking__form button { border: 0; border-radius: 999px; padding: 1rem; background: linear-gradient(135deg, #dc2626, #f97316); color: #fff; font: inherit; font-weight: 800; cursor: pointer; }
+  .tracking__message { color: #dc2626; min-height: 1.4rem; margin: 0; }
+  .tracking__result { margin-top: 1rem; }
+  .tracking__result dl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; }
+  .tracking__result dl div { background: #f8fafc; padding: 0.9rem; border-radius: 16px; }
+  .tracking__result dt { color: #64748b; font-size: 0.8rem; }
+  .tracking__result dd { margin: 0.25rem 0 0; font-weight: 700; }
+  .tracking__status { display: inline-flex; border-radius: 999px; padding: 0.5rem 0.8rem; background: #b45309; color: #fff; font-weight: 700; }
+  .tracking__status--confirmada, .tracking__status--completada { background: #166534; }
+  .tracking__status--cancelada { background: #991b1b; }
+
+  @media (max-width: 620px) {
+    .tracking__result dl { grid-template-columns: 1fr; }
+  }
+</style>

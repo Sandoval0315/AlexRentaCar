@@ -62,11 +62,13 @@ const requests = await getRentalRequests(session.accessToken);
             <span>${escapeHtml(item.rental_snapshot?.brand || '')} ${escapeHtml(item.rental_snapshot?.model || '')} ${escapeHtml(item.rental_snapshot?.year || '')}</span>
             <span>${formatDate(item.start_date)} - ${formatDate(item.end_date)}</span>
             <span>${formatMoney(item.total_estimate)}</span>
+            <span>Código: ${escapeHtml(item.request_code)}</span>
           </div>
           ${item.notes ? `<p class="request-card__notes">${escapeHtml(item.notes)}</p>` : ''}
           <div class="request-card__actions">
             <button type="button" data-status="confirmada" data-id="${escapeHtml(item.id)}">Confirmar</button>
             <button type="button" data-status="cancelada" data-id="${escapeHtml(item.id)}" class="button-secondary">Cancelar</button>
+            <button type="button" data-status="completada" data-id="${escapeHtml(item.id)}" class="button-complete">Completar</button>
             <button type="button" data-delete="${escapeHtml(item.id)}" class="danger">Eliminar</button>
           </div>
         </article>
@@ -200,6 +202,10 @@ const requests = await getRentalRequests(session.accessToken);
 
   .request-card__actions .danger {
     background: #dc2626;
+  }
+
+  .request-card__actions .button-complete {
+    background: #1d4ed8;
   }
 
   .request-message {

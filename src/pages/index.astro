@@ -94,6 +94,9 @@ const popularCars = await getFeaturedRentals(3);
           </a>
         ))}
       </div>
+      {popularCars.length === 0 && (
+        <p class="empty-state">Pronto publicaremos nuevos vehículos destacados.</p>
+      )}
       <div class="section-cta">
         <a href="/catalogo" class="btn btn-primary">
           Ver Catálogo Completo

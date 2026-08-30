@@ -42,6 +42,11 @@ const currentPath = Astro.url.pathname;
                 class={`navbar__nav-item ${currentPath === "/contacto" ? "active" : ""}`}
                 >Contacto</a
             >
+            <a
+                href="/solicitud"
+                class={`navbar__nav-item ${currentPath === "/solicitud" ? "active" : ""}`}
+                >Mi solicitud</a
+            >
 
             <!-- Search -->
             <div class="navbar__search">
@@ -124,6 +129,11 @@ const currentPath = Astro.url.pathname;
                 href="/contacto"
                 class={`navbar__mobile-item ${currentPath === "/contacto" ? "active" : ""}`}
                 >Contacto</a
+            >
+            <a
+                href="/solicitud"
+                class={`navbar__mobile-item ${currentPath === "/solicitud" ? "active" : ""}`}
+                >Mi solicitud</a
             >
 
             <!-- Mobile Login Button -->

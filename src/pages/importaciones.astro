@@ -60,6 +60,9 @@ const imports = await getImports();
         </div>
       </article>
     ))}
+    {imports.length === 0 && (
+      <p class="imports-empty">Todavía no hay importaciones publicadas.</p>
+    )}
   </section>
 </MainLayout>
 
@@ -101,6 +104,15 @@ const imports = await getImports();
     padding: 0 1.25rem;
     display: grid;
     gap: 1rem;
+  }
+
+  .imports-empty {
+    background: #fff;
+    border-radius: 24px;
+    padding: 2rem;
+    text-align: center;
+    color: #64748b;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
   }
 
   .import-card {

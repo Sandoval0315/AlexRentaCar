@@ -88,7 +88,7 @@ if (!car) {
 
           <div class="car-detail__booking">
             <h3 class="car-detail__section-title">Reservar este vehiculo</h3>
-            <form class="car-detail__booking-form" id="rental-request-form">
+            <form class="car-detail__booking-form" id="rental-request-form" data-daily-price={car.price_per_day}>
               <input type="hidden" name="rental_id" value={car.id} />
               <div class="car-detail__form-row">
                 <div class="car-detail__form-group">
@@ -125,6 +125,7 @@ if (!car) {
               <button type="submit" class="car-detail__submit-button" disabled={!car.available}>
                 {car.available ? 'Solicitar reserva' : 'No disponible'}
               </button>
+              <p class="car-detail__estimate" id="rental-estimate"></p>
               <p class="car-detail__form-message" id="rental-request-message"></p>
             </form>
           </div>
@@ -138,6 +139,29 @@ if (!car) {
     const bookingForm = document.getElementById('rental-request-form');
     const bookingMessage = document.getElementById('rental-request-message');
     const mainImage = document.getElementById('main-image');
+    const estimate = document.getElementById('rental-estimate');
+    const startDate = document.getElementById('startDate');
+    const endDate = document.getElementById('endDate');
+    const dailyPrice = Number(bookingForm?.dataset.dailyPrice || 0);
+
+    const today = new Date().toISOString().slice(0, 10);
+    startDate?.setAttribute('min', today);
+    endDate?.setAttribute('min', today);
+
+    function updateEstimate() {
+      const start = startDate?.value;
+      const end = endDate?.value;
+      if (start) endDate?.setAttribute('min', start);
+      if (!start || !end || end < start) {
+        estimate.textContent = '';
+        return;
+      }
+      const days = Math.max(1, Math.ceil((new Date(`${end}T00:00:00`) - new Date(`${start}T00:00:00`)) / 86400000));
+      estimate.textContent = `Estimado: $${(dailyPrice * days).toFixed(2)} por ${days} día${days === 1 ? '' : 's'}.`;
+    }
+
+    startDate?.addEventListener('change', updateEstimate);
+    endDate?.addEventListener('change', updateEstimate);
 
     document.querySelectorAll('[data-image]').forEach((button) => {
       button.addEventListener('click', () => {
@@ -166,7 +190,8 @@ if (!car) {
         }
 
         bookingForm.reset();
-        bookingMessage.textContent = 'Solicitud recibida. Te contactaremos para confirmar disponibilidad.';
+        estimate.textContent = '';
+        bookingMessage.innerHTML = `Solicitud recibida. Guarda tu código <strong>${data.request_code}</strong>. <a href="/solicitud?codigo=${encodeURIComponent(data.request_code)}">Consultar estado</a>.`;
       } catch (error) {
         bookingMessage.textContent = error.message;
       }

@@ -1,13 +1,12 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
 import { requireAdmin } from '../../lib/admin-auth.js';
-import { formatCurrency, formatDate, getDashboardSummary, getPublicConfig } from '../../lib/data.js';
+import { formatCurrency, formatDate, getDashboardSummary } from '../../lib/data.js';
 
 const session = await requireAdmin(Astro);
 if (session instanceof Response) return session;
 
 const summary = await getDashboardSummary(session.accessToken);
-const config = getPublicConfig();
 ---
 
 <AdminLayout
@@ -32,9 +31,9 @@ const config = getPublicConfig();
       <small>{summary.rentalRequestsPending} pendientes</small>
     </article>
     <article class="stat-card">
-      <span>Cloudinary</span>
-      <strong>{config.cloudinaryCloudName ? 'Listo' : 'Pendiente'}</strong>
-      <small>{config.cloudinaryCloudName ? 'Subida directa activa' : 'Faltan variables Cloudinary'}</small>
+      <span>Mensajes</span>
+      <strong>{summary.contactMessagesTotal}</strong>
+      <small>{summary.contactMessagesNew} nuevos</small>
     </article>
   </section>
 
@@ -110,13 +109,24 @@ const config = getPublicConfig();
     </article>
 
     <article class="panel">
-      <span class="panel__eyebrow">Configuracion necesaria</span>
-      <h2>Checklist tecnico</h2>
-      <ul class="checklist">
-        <li>Ejecuta `supabase-schema.sql` en tu proyecto de Supabase.</li>
-        <li>Agrega las variables de `.env.example` en Vercel/local.</li>
-        <li>Para fotos desde el admin, configura `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` y `CLOUDINARY_API_SECRET`.</li>
-      </ul>
+      <div class="panel__header">
+        <div>
+          <span class="panel__eyebrow">Contacto reciente</span>
+          <h2>Mensajes públicos</h2>
+        </div>
+        <a href="/admin/mensajes">Ver todos</a>
+      </div>
+      <div class="list">
+        {summary.recentContactMessages.map((item) => (
+          <div class="list-item list-item--no-image">
+            <div>
+              <strong>{item.name}</strong>
+              <p>{item.subject} · {item.email}</p>
+            </div>
+            <span>{item.status}</span>
+          </div>
+        ))}
+      </div>
     </article>
   </section>
 </AdminLayout>

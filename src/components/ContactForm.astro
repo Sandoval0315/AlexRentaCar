@@ -126,9 +126,6 @@
       formMessage.style.display = 'none';
       
       try {
-        // Cargar EmailJS
-        const emailjs = await loadEmailJS();
-        
         const formData = {
           name: document.getElementById('name').value,
           email: document.getElementById('email').value,
@@ -138,15 +135,29 @@
           from_page: window.location.href,
           date: new Date().toLocaleString('es-SV')
         };
-        
-        // Enviar el email
-        const result = await emailjs.send(
-          EMAILJS_CONFIG.SERVICE_ID,
-          EMAILJS_CONFIG.TEMPLATE_ID,
-          formData
-        );
-        
-        console.log('Email enviado:', result);
+
+        // Supabase es la fuente principal: el mensaje siempre queda visible
+        // para el equipo en el panel administrativo.
+        const response = await fetch('/api/contact-messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        });
+        const saved = await response.json();
+        if (!response.ok) throw new Error(saved.error || 'No se pudo guardar el mensaje.');
+
+        // El correo es una notificación adicional. Si EmailJS falla, el
+        // mensaje ya está guardado y no se pierde.
+        try {
+          const emailjs = await loadEmailJS();
+          await emailjs.send(
+            EMAILJS_CONFIG.SERVICE_ID,
+            EMAILJS_CONFIG.TEMPLATE_ID,
+            formData
+          );
+        } catch (emailError) {
+          console.warn('El mensaje se guardó, pero la notificación por correo falló.', emailError);
+        }
         
         // Éxito
         formMessage.textContent = '¡Mensaje enviado correctamente! Te contactaremos pronto.';
