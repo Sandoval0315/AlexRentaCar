@@ -65,7 +65,7 @@ const publicConfig = getPublicConfig();
 
         <label>Descripcion<textarea name="description" rows="4"></textarea></label>
         <label>Caracteristicas<textarea name="featuresText" rows="3" placeholder="Una por linea"></textarea></label>
-        <label>URLs de imagen<textarea name="imagesText" rows="3" placeholder="Una por linea"></textarea></label>
+        <label>URLs de imagen<textarea name="imagesText" rows="3" placeholder="Una URL por línea; la primera será la portada"></textarea><small>Admite hasta 12 imágenes por vehículo.</small></label>
         {publicConfig.cloudinaryCloudName && (
           <label>Subir imagenes
             <input id="rental-image-upload" type="file" accept="image/*" multiple />

@@ -3,200 +3,88 @@ import MainLayout from '../layouts/MainLayout.astro';
 import { formatCurrency, getImports } from '../lib/data.js';
 
 const imports = await getImports();
+const completed = imports.filter((item) => item.status.toLowerCase().includes('entreg')).length;
 ---
 
-<MainLayout title="Importaciones - Alex Renta Cars">
+<MainLayout title="Importación de vehículos | Alex Renta Cars" description="Conoce el proceso y consulta vehículos gestionados por Alex Renta Cars desde su origen hasta El Salvador.">
   <section class="imports-hero">
-    <div class="imports-hero__content">
-      <span class="imports-hero__eyebrow">Casos reales</span>
-      <h1>Importaciones administradas desde el panel</h1>
-      <p>
-        Cada vehiculo mostrado aqui sale del admin: fotos, estado actual, tiempo de transito
-        y medio de envio. Todo pensado para verse impecable en telefono.
-      </p>
+    <div class="imports-shell imports-hero__grid">
+      <div>
+        <span class="eyebrow">Importaciones a El Salvador</span>
+        <h1>Tu próximo vehículo, con una ruta clara.</h1>
+        <p>Te acompañamos desde la búsqueda hasta la entrega. Cada gestión publicada refleja los datos y avances registrados por nuestro equipo.</p>
+        <a href="/contacto?asunto=importacion">Consultar una importación <span aria-hidden="true">→</span></a>
+      </div>
+      <dl>
+        <div><dt>Gestiones publicadas</dt><dd>{imports.length}</dd></div>
+        <div><dt>Entregas registradas</dt><dd>{completed}</dd></div>
+      </dl>
     </div>
   </section>
 
-  <section class="imports-grid">
-    {imports.map((item) => (
-      <article class="import-card">
-        <div class="import-card__image">
-          <img src={item.images[0] || '/img/ford-explorer1.jpg'} alt={item.title} />
-          <span>{item.status}</span>
-        </div>
-        <div class="import-card__content">
-          <div class="import-card__header">
-            <div>
-              <h2>{item.title}</h2>
-              <p>{item.brand} {item.model} · {item.year}</p>
-            </div>
-            <strong>{formatCurrency(item.price)}</strong>
-          </div>
+  <section class="process">
+    <div class="imports-shell">
+      <div class="section-heading"><span class="eyebrow">Cómo trabajamos</span><h2>Acompañamiento en cada etapa</h2></div>
+      <ol>
+        <li><span>01</span><div><strong>Definimos tu búsqueda</strong><p>Marca, modelo, presupuesto y características que necesitas.</p></div></li>
+        <li><span>02</span><div><strong>Evaluamos opciones</strong><p>Revisamos alternativas y compartimos la información disponible antes de avanzar.</p></div></li>
+        <li><span>03</span><div><strong>Coordinamos el traslado</strong><p>Damos seguimiento al recorrido y a las etapas asociadas a la importación.</p></div></li>
+        <li><span>04</span><div><strong>Preparamos la entrega</strong><p>Confirmamos contigo los detalles finales cuando el vehículo está listo.</p></div></li>
+      </ol>
+    </div>
+  </section>
 
-          <p class="import-card__summary">{item.summary}</p>
+  <section class="imports-list">
+    <div class="imports-shell">
+      <div class="list-heading">
+        <div><span class="eyebrow">Seguimiento visible</span><h2>Vehículos gestionados</h2></div>
+        <p>La información cambia cuando nuestro equipo actualiza cada proceso.</p>
+      </div>
+      <div class="imports-grid">
+        {imports.map((item) => (
+          <article class="import-card">
+            <div class="import-card__image">
+              <img src={item.images[0] || '/img/ford-explorer1.jpg'} alt={`${item.brand} ${item.model} ${item.year}`} loading="lazy" />
+              <span>{item.status}</span>
+              {item.images.length > 1 && <small>{item.images.length} fotos</small>}
+            </div>
+            <div class="import-card__content">
+              <div class="import-card__top">
+                <div><span>{item.condition || 'Condición por confirmar'}</span><h3>{item.title || `${item.brand} ${item.model} ${item.year}`}</h3></div>
+                {item.price > 0 && <strong>{formatCurrency(item.price)}<small>valor registrado</small></strong>}
+              </div>
+              {item.summary && <p class="summary">{item.summary}</p>}
+              <dl class="meta">
+                <div><dt>Origen</dt><dd>{item.origin || 'Por confirmar'}</dd></div>
+                <div><dt>Destino</dt><dd>{item.destination || 'El Salvador'}</dd></div>
+                <div><dt>Traslado</dt><dd>{item.shipping_method || 'Por confirmar'}</dd></div>
+                <div><dt>Tiempo registrado</dt><dd>{item.transit_time_days > 0 ? `${item.transit_time_days} días` : 'En seguimiento'}</dd></div>
+              </dl>
+              <div class="route" aria-label={`Ruta de ${item.origin} a ${item.destination}`}>
+                <i></i><span>{item.origin || 'Origen'}</span><b></b><i></i><span>{item.destination || 'Destino'}</span>
+              </div>
+            </div>
+          </article>
+        ))}
+        {imports.length === 0 && <div class="imports-empty"><strong>Próximamente publicaremos nuevas gestiones.</strong><p>Mientras tanto, puedes contarnos qué vehículo buscas.</p><a href="/contacto?asunto=importacion">Hablar con el equipo</a></div>}
+      </div>
+    </div>
+  </section>
 
-          <dl class="import-card__meta">
-            <div>
-              <dt>Cliente</dt>
-              <dd>{item.client_name}</dd>
-            </div>
-            <div>
-              <dt>Condicion</dt>
-              <dd>{item.condition}</dd>
-            </div>
-            <div>
-              <dt>Tiempo</dt>
-              <dd>{item.transit_time_days} dias</dd>
-            </div>
-            <div>
-              <dt>Medio</dt>
-              <dd>{item.shipping_method}</dd>
-            </div>
-            <div>
-              <dt>Ruta</dt>
-              <dd>{item.origin} a {item.destination}</dd>
-            </div>
-          </dl>
-        </div>
-      </article>
-    ))}
-    {imports.length === 0 && (
-      <p class="imports-empty">Todavía no hay importaciones publicadas.</p>
-    )}
+  <section class="imports-cta">
+    <div class="imports-shell"><div><span class="eyebrow">Cuéntanos qué buscas</span><h2>Iniciemos con tus requisitos.</h2></div><a href="/contacto?asunto=importacion">Solicitar información</a></div>
   </section>
 </MainLayout>
 
 <style>
-  .imports-hero {
-    padding: 4.5rem 1.25rem 2rem;
-    background:
-      radial-gradient(circle at top left, rgba(249, 115, 22, 0.18), transparent 22%),
-      linear-gradient(135deg, #111827, #1f2937 55%, #7f1d1d);
-    color: #fff;
-  }
-
-  .imports-hero__content {
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-
-  .imports-hero__eyebrow {
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    color: #fdba74;
-    font-size: 0.72rem;
-  }
-
-  .imports-hero h1 {
-    margin: 0.8rem 0;
-    font-size: clamp(2rem, 6vw, 4rem);
-    max-width: 800px;
-  }
-
-  .imports-hero p {
-    max-width: 680px;
-    color: #e5e7eb;
-  }
-
-  .imports-grid {
-    max-width: 1100px;
-    margin: -2rem auto 4rem;
-    padding: 0 1.25rem;
-    display: grid;
-    gap: 1rem;
-  }
-
-  .imports-empty {
-    background: #fff;
-    border-radius: 24px;
-    padding: 2rem;
-    text-align: center;
-    color: #64748b;
-    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
-  }
-
-  .import-card {
-    display: grid;
-    grid-template-columns: 320px minmax(0, 1fr);
-    background: #fff;
-    border-radius: 28px;
-    overflow: hidden;
-    box-shadow: 0 22px 55px rgba(15, 23, 42, 0.1);
-  }
-
-  .import-card__image {
-    position: relative;
-    min-height: 280px;
-  }
-
-  .import-card__image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .import-card__image span {
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
-    border-radius: 999px;
-    background: rgba(17, 24, 39, 0.84);
-    color: #fff;
-    padding: 0.5rem 0.85rem;
-    font-size: 0.8rem;
-  }
-
-  .import-card__content {
-    padding: 1.5rem;
-    display: grid;
-    gap: 1rem;
-  }
-
-  .import-card__header {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    align-items: flex-start;
-  }
-
-  .import-card__header h2 {
-    margin-bottom: 0.35rem;
-  }
-
-  .import-card__header p,
-  .import-card__summary,
-  .import-card__meta dt {
-    color: #6b7280;
-  }
-
-  .import-card__meta {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.9rem;
-  }
-
-  .import-card__meta div {
-    background: #f8fafc;
-    border-radius: 18px;
-    padding: 0.9rem 1rem;
-  }
-
-  .import-card__meta dt {
-    font-size: 0.8rem;
-    margin-bottom: 0.2rem;
-  }
-
-  @media (max-width: 800px) {
-    .import-card {
-      grid-template-columns: 1fr;
-    }
-
-    .imports-grid {
-      margin-top: -1.2rem;
-    }
-
-    .import-card__meta {
-      grid-template-columns: 1fr;
-    }
-  }
+  .imports-shell{width:min(1180px,calc(100% - 2.5rem));margin-inline:auto}.eyebrow{display:block;color:#e02d2d;font-size:.72rem;font-weight:800;letter-spacing:.17em;text-transform:uppercase}
+  .imports-hero{position:relative;overflow:hidden;padding:clamp(4rem,9vw,7.5rem) 0 6rem;color:#fff;background:radial-gradient(circle at 76% 16%,rgba(224,45,45,.38),transparent 29%),linear-gradient(135deg,#101722,#1c2635 62%,#381519)}.imports-hero:after{content:'';position:absolute;right:-8rem;bottom:-19rem;width:600px;height:420px;border:1px solid rgba(255,255,255,.08);border-radius:50%;transform:rotate(-12deg)}
+  .imports-hero__grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(280px,.55fr);gap:5rem;align-items:end}.imports-hero .eyebrow{color:#ff9a7b}.imports-hero h1{max-width:780px;margin:.7rem 0 1rem;font-size:clamp(2.9rem,7vw,5.8rem);line-height:.96;letter-spacing:-.055em}.imports-hero p{max-width:650px;color:#cbd5e1;font-size:1.05rem}.imports-hero a{display:inline-flex;gap:.7rem;margin-top:1.7rem;border-radius:14px;padding:.85rem 1.1rem;background:#dc2626;color:#fff;text-decoration:none;font-weight:800}.imports-hero dl{display:grid;grid-template-columns:1fr 1fr;overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:22px;background:rgba(255,255,255,.06)}.imports-hero dl div{padding:1.2rem;border-right:1px solid rgba(255,255,255,.1)}.imports-hero dl div:last-child{border:0}.imports-hero dt{color:#94a3b8;font-size:.7rem;text-transform:uppercase}.imports-hero dd{margin-top:.25rem;font-size:1.75rem;font-weight:850}
+  .process{padding:4.5rem 0;background:#fff}.section-heading h2,.list-heading h2{margin:.35rem 0 1.7rem;font-size:clamp(2rem,4vw,3.2rem);letter-spacing:-.045em}.process ol{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;list-style:none}.process li{min-width:0;padding:1.2rem;border:1px solid #e6e8eb;border-radius:20px;background:#fafafa}.process li>span{display:inline-grid;width:2rem;height:2rem;place-items:center;border-radius:50%;background:#111827;color:#fff;font-size:.68rem;font-weight:800}.process strong{display:block;margin:.9rem 0 .35rem;color:#111827}.process p{color:#64748b;font-size:.84rem;line-height:1.55}
+  .imports-list{padding:5rem 0;background:#f5f3f0}.list-heading{display:flex;justify-content:space-between;gap:2rem;align-items:end;margin-bottom:1.5rem}.list-heading h2{margin-bottom:0}.list-heading>p{max-width:360px;color:#64748b;text-align:right}.imports-grid{display:grid;gap:1.25rem}.import-card{display:grid;grid-template-columns:minmax(300px,.8fr) minmax(0,1.2fr);overflow:hidden;border:1px solid rgba(15,23,42,.07);border-radius:28px;background:#fff;box-shadow:0 18px 50px rgba(15,23,42,.08)}.import-card__image{position:relative;min-height:340px;background:#e5e7eb}.import-card__image img{width:100%;height:100%;object-fit:cover}.import-card__image>span,.import-card__image>small{position:absolute;top:1rem;border-radius:999px;padding:.46rem .72rem;color:#fff;font-size:.72rem;font-weight:800;backdrop-filter:blur(10px)}.import-card__image>span{left:1rem;background:rgba(21,128,61,.9)}.import-card__image>small{right:1rem;background:rgba(15,23,42,.72)}
+  .import-card__content{display:grid;align-content:center;gap:1.15rem;padding:clamp(1.3rem,3vw,2.2rem)}.import-card__top{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start}.import-card__top>div>span{color:#dc2626;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.1em}.import-card h3{margin-top:.25rem;font-size:clamp(1.5rem,3vw,2.15rem);letter-spacing:-.035em}.import-card__top>strong{font-size:1.4rem;white-space:nowrap}.import-card__top>strong small{display:block;color:#94a3b8;font-size:.62rem;text-align:right;font-weight:600}.summary{color:#64748b}.meta{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem}.meta div{padding:.8rem;border-radius:14px;background:#f3f4f6}.meta dt{color:#94a3b8;font-size:.67rem}.meta dd{margin-top:.15rem;color:#334155;font-size:.78rem;font-weight:750}.route{display:grid;grid-template-columns:auto auto 1fr auto auto;gap:.5rem;align-items:center;padding-top:.4rem;color:#64748b;font-size:.7rem;font-weight:700}.route i{width:10px;height:10px;border:3px solid #dc2626;border-radius:50%}.route b{height:1px;background:#d1d5db}
+  .imports-empty{padding:3rem;border:1px dashed #cbd5e1;border-radius:24px;text-align:center;color:#64748b}.imports-empty strong{display:block;color:#111827;font-size:1.2rem}.imports-empty a{display:inline-block;margin-top:1rem;color:#dc2626;font-weight:800}
+  .imports-cta{padding:4rem 0;background:#111827;color:#fff}.imports-cta .imports-shell{display:flex;justify-content:space-between;gap:2rem;align-items:center}.imports-cta h2{margin-top:.35rem;font-size:clamp(1.8rem,4vw,3rem);letter-spacing:-.04em}.imports-cta a{border-radius:14px;padding:.9rem 1.15rem;background:#dc2626;color:#fff;text-decoration:none;font-weight:800;white-space:nowrap}
+  @media(max-width:900px){.imports-hero__grid{grid-template-columns:1fr;gap:2.5rem}.imports-hero dl{max-width:520px}.process ol{grid-template-columns:repeat(2,1fr)}.import-card{grid-template-columns:1fr}.import-card__image{min-height:0;aspect-ratio:16/9}.meta{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:620px){.imports-shell{width:min(100% - 1.25rem,1180px)}.imports-hero{padding:3.5rem 0 4.5rem}.imports-hero h1{font-size:clamp(2.55rem,14vw,4rem)}.imports-hero dl,.process ol,.meta{grid-template-columns:1fr}.imports-hero dl div{display:flex;justify-content:space-between;align-items:center;border-right:0;border-bottom:1px solid rgba(255,255,255,.1)}.list-heading,.imports-cta .imports-shell,.import-card__top{display:grid}.list-heading>p{text-align:left}.import-card{border-radius:20px}.import-card__image{aspect-ratio:4/3}.import-card__top>strong small{text-align:left}.imports-cta a{width:100%;text-align:center}}
 </style>

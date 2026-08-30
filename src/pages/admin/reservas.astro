@@ -46,7 +46,7 @@ const publicConfig = getPublicConfig();
         </div>
 
         <label>Resumen<textarea name="summary" rows="4"></textarea></label>
-        <label>URLs de imagen<textarea name="imagesText" rows="3" placeholder="Una por linea"></textarea></label>
+        <label>URLs de imagen<textarea name="imagesText" rows="3" placeholder="Una URL por línea; la primera será la portada"></textarea><small>Admite hasta 12 imágenes por importación.</small></label>
         {publicConfig.cloudinaryCloudName && (
           <label>Subir imagenes
             <input id="import-image-upload" type="file" accept="image/*" multiple />

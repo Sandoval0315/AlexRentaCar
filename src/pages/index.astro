@@ -3,7 +3,7 @@ import MainLayout from '../layouts/MainLayout.astro';
 import HeroGifSection from '../components/HeroGifSection.astro';
 import ContactForm from '../components/ContactForm.astro';
 import GoogleMap from '../components/GoogleMap.astro';
-import { getFeaturedRentals } from '../lib/data.js';
+import { getFeaturedRentals, rentalSlug } from '../lib/data.js';
 
 const popularCars = await getFeaturedRentals(3);
 
@@ -65,7 +65,7 @@ const popularCars = await getFeaturedRentals(3);
       </div>
       <div class="cars-grid">
         {popularCars.map((car) => (
-          <a href={`/catalogo/${car.id}`} class="car-card">
+          <a href={`/catalogo/${rentalSlug(car)}`} class="car-card">
             <div class="car-card__image">
               <img src={car.images[0]} alt={`${car.brand} ${car.model}`} />
               <div class="car-card__overlay">
@@ -175,7 +175,7 @@ const popularCars = await getFeaturedRentals(3);
               </div>
               <div class="contact-text">
                 <strong>Teléfono</strong>
-                <span>+503 1234-5678</span>
+                <span>+503 2275-8900</span>
               </div>
             </div>
             

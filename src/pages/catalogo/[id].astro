@@ -1,149 +1,95 @@
 ---
 import MainLayout from '../../layouts/MainLayout.astro';
-import { categoryLabel, fuelLabel, getRentalById, transmissionLabel } from '../../lib/data.js';
+import { categoryLabel, fuelLabel, getRentalById, rentalSlug, transmissionLabel } from '../../lib/data.js';
 
 const { id } = Astro.params;
 const car = await getRentalById(id);
-
-if (!car) {
-  return Astro.redirect('/catalogo');
-}
+if (!car) return Astro.redirect('/catalogo');
+const slug = rentalSlug(car);
+if (id !== slug) return Astro.redirect(`/catalogo/${slug}`, 301);
+const images = car.images.length ? car.images : ['/img/toyota-corolla-2023-1.jpg'];
 ---
 
-<MainLayout title={`${car.brand} ${car.model} - Alex Renta Cars`}>
-  <section class="car-detail">
-    <div class="car-detail__container">
-      <nav class="car-detail__breadcrumb">
-        <a href="/catalogo" class="car-detail__breadcrumb-link">Catalogo</a>
-        <span>/</span>
-        <span>{car.brand} {car.model}</span>
+<MainLayout title={`${car.brand} ${car.model} ${car.year} | Alex Renta Cars`} description={`Fotos, características, tarifa y disponibilidad del ${car.brand} ${car.model} ${car.year}.`}>
+  <section class="detail-hero">
+    <div class="detail-shell">
+      <nav class="breadcrumb" aria-label="Migas de pan">
+        <a href="/">Inicio</a><span>/</span><a href="/catalogo">Alquiler</a><span>/</span><span>{car.brand} {car.model}</span>
       </nav>
-
-      <div class="car-detail__content">
-        <div class="car-detail__gallery">
-          <div class="car-detail__main-image">
-            <img src={car.images[0] || '/img/toyota-corolla-2023-1.jpg'} alt={`${car.brand} ${car.model}`} class="car-detail__image" id="main-image" />
-          </div>
-          <div class="car-detail__thumbnails">
-            {car.images.map((image, index) => (
-              <button class="car-detail__thumbnail" type="button" data-image={image} aria-label={`Imagen ${index + 1}`}>
-                <img src={image} alt={`${car.brand} ${car.model} ${index + 1}`} class="car-detail__thumbnail-image" />
-              </button>
-            ))}
-          </div>
+      <div class="detail-heading">
+        <div>
+          <span class="eyebrow">{categoryLabel(car.category)} · {car.year}</span>
+          <h1>{car.brand} {car.model}</h1>
+          <p>{car.description}</p>
         </div>
-
-        <div class="car-detail__info">
-          <div class="car-detail__header">
-            <div class="car-detail__title-section">
-              <h1 class="car-detail__title">{car.brand} {car.model}</h1>
-              <div class="car-detail__meta">
-                <span class="car-detail__year">{car.year}</span>
-                <span class={`car-detail__availability ${car.available ? 'car-detail__availability--available' : 'car-detail__availability--unavailable'}`}>
-                  {car.status}
-                </span>
-              </div>
-            </div>
-            <div class="car-detail__price">
-              <span class="car-detail__price-amount">${car.price_per_day}</span>
-              <span class="car-detail__price-period">/dia</span>
-            </div>
-          </div>
-
-          <p class="car-detail__description">{car.description}</p>
-
-          <div class="car-detail__specs">
-            <h3 class="car-detail__section-title">Especificaciones</h3>
-            <div class="car-detail__specs-grid">
-              <div class="car-detail__spec-item">
-                <span class="car-detail__spec-label">Categoria</span>
-                <span class="car-detail__spec-value">{categoryLabel(car.category)}</span>
-              </div>
-              <div class="car-detail__spec-item">
-                <span class="car-detail__spec-label">Transmision</span>
-                <span class="car-detail__spec-value">{transmissionLabel(car.transmission)}</span>
-              </div>
-              <div class="car-detail__spec-item">
-                <span class="car-detail__spec-label">Combustible</span>
-                <span class="car-detail__spec-value">{fuelLabel(car.fuel_type)}</span>
-              </div>
-              <div class="car-detail__spec-item">
-                <span class="car-detail__spec-label">Capacidad</span>
-                <span class="car-detail__spec-value">{car.seats} pasajeros</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="car-detail__features">
-            <h3 class="car-detail__section-title">Caracteristicas</h3>
-            <div class="car-detail__features-grid">
-              {car.features.map((feature) => (
-                <div class="car-detail__feature">
-                  <span>•</span>
-                  <span>{feature}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div class="car-detail__booking">
-            <h3 class="car-detail__section-title">Reservar este vehiculo</h3>
-            <form class="car-detail__booking-form" id="rental-request-form" data-daily-price={car.price_per_day}>
-              <input type="hidden" name="rental_id" value={car.id} />
-              <div class="car-detail__form-row">
-                <div class="car-detail__form-group">
-                  <label for="startDate" class="car-detail__form-label">Fecha de inicio</label>
-                  <input type="date" id="startDate" name="startDate" class="car-detail__form-input" required />
-                </div>
-                <div class="car-detail__form-group">
-                  <label for="endDate" class="car-detail__form-label">Fecha de fin</label>
-                  <input type="date" id="endDate" name="endDate" class="car-detail__form-input" required />
-                </div>
-              </div>
-
-              <div class="car-detail__form-group">
-                <label for="customerName" class="car-detail__form-label">Nombre completo</label>
-                <input type="text" id="customerName" name="customerName" class="car-detail__form-input" required />
-              </div>
-
-              <div class="car-detail__form-row">
-                <div class="car-detail__form-group">
-                  <label for="customerEmail" class="car-detail__form-label">Email</label>
-                  <input type="email" id="customerEmail" name="customerEmail" class="car-detail__form-input" required />
-                </div>
-                <div class="car-detail__form-group">
-                  <label for="customerPhone" class="car-detail__form-label">Telefono</label>
-                  <input type="tel" id="customerPhone" name="customerPhone" class="car-detail__form-input" required />
-                </div>
-              </div>
-
-              <div class="car-detail__form-group">
-                <label for="notes" class="car-detail__form-label">Notas</label>
-                <textarea id="notes" name="notes" class="car-detail__form-textarea" rows="3"></textarea>
-              </div>
-
-              <button type="submit" class="car-detail__submit-button" disabled={!car.available}>
-                {car.available ? 'Solicitar reserva' : 'No disponible'}
-              </button>
-              <p class="car-detail__estimate" id="rental-estimate"></p>
-              <p class="car-detail__form-message" id="rental-request-message"></p>
-            </form>
-          </div>
-        </div>
+        <div class="price-block"><span>Tarifa diaria</span><strong>${car.price_per_day}<small>/día</small></strong></div>
       </div>
     </div>
-	  </section>
+  </section>
+
+  <section class="detail-main">
+    <div class="detail-shell detail-layout">
+      <div class="detail-left">
+        <div class="gallery">
+          <div class="gallery__main">
+            <img id="main-image" src={images[0]} alt={`${car.brand} ${car.model} ${car.year}`} />
+            <span class:list={['availability', car.available ? 'is-available' : 'is-unavailable']}>{car.available ? 'Disponible para solicitar' : car.status}</span>
+            <span class="photo-count">{images.length} {images.length === 1 ? 'foto' : 'fotos'}</span>
+          </div>
+          {images.length > 1 && <div class="gallery__thumbs" aria-label="Galería del vehículo">
+            {images.map((image, index) => <button class:list={['gallery__thumb', { 'is-active': index === 0 }]} type="button" data-image={image} aria-label={`Ver fotografía ${index + 1}`}><img src={image} alt="" loading="lazy" /></button>)}
+          </div>}
+        </div>
+
+        <div class="vehicle-details">
+          <div class="section-heading"><span class="eyebrow">Información del vehículo</span><h2>Comodidad para tu recorrido</h2></div>
+          <dl class="spec-grid">
+            <div><dt>Categoría</dt><dd>{categoryLabel(car.category)}</dd></div>
+            <div><dt>Transmisión</dt><dd>{transmissionLabel(car.transmission)}</dd></div>
+            <div><dt>Combustible</dt><dd>{fuelLabel(car.fuel_type)}</dd></div>
+            <div><dt>Capacidad</dt><dd>{car.seats} pasajeros</dd></div>
+          </dl>
+          {car.features.length > 0 && <div class="features"><h3>Equipamiento incluido</h3><ul>{car.features.map((feature) => <li><span aria-hidden="true">✓</span>{feature}</li>)}</ul></div>}
+        </div>
+      </div>
+
+      <aside class="booking-card" aria-labelledby="booking-title">
+        <div class="booking-card__header">
+          <span class="eyebrow">Solicitud sin pago en línea</span>
+          <h2 id="booking-title">Consulta tus fechas</h2>
+          <p>Envíanos la solicitud. Confirmaremos la disponibilidad y te contactaremos para coordinar la reserva.</p>
+        </div>
+        <form id="rental-request-form" data-daily-price={car.price_per_day}>
+          <input type="hidden" name="rental_id" value={car.id} />
+          <div class="form-row">
+            <label>Fecha de inicio<input type="date" id="startDate" name="startDate" required /></label>
+            <label>Fecha de devolución<input type="date" id="endDate" name="endDate" required /></label>
+          </div>
+          <label>Nombre completo<input type="text" name="customerName" autocomplete="name" placeholder="Tu nombre" required /></label>
+          <div class="form-row">
+            <label>Correo electrónico<input type="email" name="customerEmail" autocomplete="email" placeholder="nombre@correo.com" required /></label>
+            <label>Teléfono<input type="tel" name="customerPhone" autocomplete="tel" placeholder="Tu número con código de país" required /></label>
+          </div>
+          <label>Detalles adicionales <span>(opcional)</span><textarea name="notes" rows="3" placeholder="Horario, lugar de entrega u otra consulta"></textarea></label>
+          <div class="estimate" id="rental-estimate" hidden></div>
+          <button type="submit" disabled={!car.available}>{car.available ? 'Enviar solicitud de reserva' : 'Vehículo no disponible'}</button>
+          <p class="form-message" id="rental-request-message" aria-live="polite"></p>
+          <small class="booking-note">No se realiza ningún cobro desde este formulario.</small>
+        </form>
+      </aside>
+    </div>
+  </section>
 
   <script>
-    // @ts-nocheck -- Interacciones del formulario y galería en el navegador.
-    const bookingForm = document.getElementById('rental-request-form');
-    const bookingMessage = document.getElementById('rental-request-message');
+    // @ts-nocheck
+    const form = document.getElementById('rental-request-form');
+    const message = document.getElementById('rental-request-message');
     const mainImage = document.getElementById('main-image');
     const estimate = document.getElementById('rental-estimate');
     const startDate = document.getElementById('startDate');
     const endDate = document.getElementById('endDate');
-    const dailyPrice = Number(bookingForm?.dataset.dailyPrice || 0);
-
+    const submit = form?.querySelector('button[type="submit"]');
+    const dailyPrice = Number(form?.dataset.dailyPrice || 0);
     const today = new Date().toISOString().slice(0, 10);
     startDate?.setAttribute('min', today);
     endDate?.setAttribute('min', today);
@@ -152,49 +98,54 @@ if (!car) {
       const start = startDate?.value;
       const end = endDate?.value;
       if (start) endDate?.setAttribute('min', start);
-      if (!start || !end || end < start) {
-        estimate.textContent = '';
-        return;
-      }
+      if (!start || !end || end < start) { estimate.hidden = true; estimate.textContent = ''; return; }
       const days = Math.max(1, Math.ceil((new Date(`${end}T00:00:00`) - new Date(`${start}T00:00:00`)) / 86400000));
-      estimate.textContent = `Estimado: $${(dailyPrice * days).toFixed(2)} por ${days} día${days === 1 ? '' : 's'}.`;
+      estimate.textContent = `Estimado de referencia: $${(dailyPrice * days).toFixed(2)} por ${days} día${days === 1 ? '' : 's'}.`;
+      estimate.hidden = false;
     }
-
     startDate?.addEventListener('change', updateEstimate);
     endDate?.addEventListener('change', updateEstimate);
-
-    document.querySelectorAll('[data-image]').forEach((button) => {
-      button.addEventListener('click', () => {
-        const image = button.getAttribute('data-image');
-        if (image && mainImage instanceof HTMLImageElement) mainImage.src = image;
-      });
-    });
-
-    bookingForm?.addEventListener('submit', async (event) => {
+    document.querySelectorAll('[data-image]').forEach((button) => button.addEventListener('click', () => {
+      const image = button.getAttribute('data-image');
+      if (image && mainImage instanceof HTMLImageElement) mainImage.src = image;
+      document.querySelectorAll('[data-image]').forEach((item) => item.classList.remove('is-active'));
+      button.classList.add('is-active');
+    }));
+    form?.addEventListener('submit', async (event) => {
       event.preventDefault();
-      bookingMessage.textContent = 'Enviando solicitud...';
-
-      const formData = new FormData(bookingForm);
-      const payload = Object.fromEntries(formData.entries());
-
+      message.className = 'form-message';
+      message.textContent = 'Enviando solicitud…';
+      submit?.setAttribute('disabled', '');
       try {
-        const response = await fetch('/api/rental-requests', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
+        const response = await fetch('/api/rental-requests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(Object.fromEntries(new FormData(form).entries())) });
         const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error || 'No se pudo enviar la solicitud.');
-        }
-
-        bookingForm.reset();
-        estimate.textContent = '';
-        bookingMessage.innerHTML = `Solicitud recibida. Guarda tu código <strong>${data.request_code}</strong>. <a href="/solicitud?codigo=${encodeURIComponent(data.request_code)}">Consultar estado</a>.`;
+        if (!response.ok) throw new Error(data.error || 'No se pudo enviar la solicitud.');
+        form.reset(); estimate.hidden = true; message.classList.add('is-success');
+        message.innerHTML = `Solicitud recibida. Tu código es <strong>${data.request_code}</strong>. <a href="/solicitud?codigo=${encodeURIComponent(data.request_code)}">Consultar estado</a>`;
       } catch (error) {
-        bookingMessage.textContent = error.message;
-      }
+        message.classList.add('is-error'); message.textContent = error.message;
+      } finally { submit?.removeAttribute('disabled'); }
     });
   </script>
 </MainLayout>
+
+<style>
+  .detail-shell{width:min(1180px,calc(100% - 2.5rem));margin-inline:auto}.eyebrow{display:block;color:#e02d2d;font-size:.72rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+  .detail-hero{padding:2rem 0 5.5rem;color:#fff;background:radial-gradient(circle at 80% 10%,rgba(224,45,45,.3),transparent 30%),linear-gradient(135deg,#111827,#1b2432 65%,#35161a)}
+  .breadcrumb{display:flex;flex-wrap:wrap;gap:.55rem;color:#94a3b8;font-size:.8rem}.breadcrumb a{color:#e2e8f0;text-decoration:none}
+  .detail-heading{display:grid;grid-template-columns:1fr auto;gap:3rem;align-items:end;margin-top:3.5rem}.detail-heading .eyebrow{color:#ff9a7b}.detail-heading h1{margin:.5rem 0 .8rem;font-size:clamp(2.8rem,7vw,5.8rem);line-height:.95;letter-spacing:-.055em}.detail-heading p{max-width:670px;color:#cbd5e1;font-size:1.05rem}
+  .price-block{min-width:180px;padding:1.15rem 1.3rem;border:1px solid rgba(255,255,255,.13);border-radius:20px;background:rgba(255,255,255,.07);backdrop-filter:blur(10px)}.price-block>span{display:block;color:#94a3b8;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em}.price-block strong{display:block;margin-top:.3rem;font-size:2rem}.price-block small{margin-left:.25rem;color:#cbd5e1;font-size:.8rem}
+  .detail-main{min-height:70vh;padding-bottom:5rem;background:#f5f3f0}.detail-layout{display:grid;grid-template-columns:minmax(0,1.42fr) minmax(340px,.78fr);gap:1.5rem;align-items:start}.detail-left{min-width:0;margin-top:-3rem}
+  .gallery{padding:.75rem;border:1px solid rgba(15,23,42,.08);border-radius:28px;background:#fff;box-shadow:0 26px 65px rgba(15,23,42,.14)}.gallery__main{position:relative;overflow:hidden;aspect-ratio:16/10;border-radius:21px;background:#e5e7eb}.gallery__main img{width:100%;height:100%;object-fit:cover}
+  .availability,.photo-count{position:absolute;top:1rem;border-radius:999px;padding:.5rem .75rem;color:#fff;font-size:.74rem;font-weight:800;backdrop-filter:blur(10px)}.availability{left:1rem}.availability.is-available{background:rgba(21,128,61,.9)}.availability.is-unavailable{background:rgba(15,23,42,.86)}.photo-count{right:1rem;background:rgba(15,23,42,.7)}
+  .gallery__thumbs{display:grid;grid-auto-flow:column;grid-auto-columns:112px;gap:.65rem;overflow-x:auto;padding-top:.75rem}.gallery__thumb{overflow:hidden;aspect-ratio:4/3;padding:0;border:3px solid transparent;border-radius:13px;background:#e5e7eb;cursor:pointer}.gallery__thumb.is-active{border-color:#dc2626}.gallery__thumb img{width:100%;height:100%;object-fit:cover}
+  .vehicle-details{margin-top:1.25rem;padding:clamp(1.3rem,3vw,2rem);border:1px solid rgba(15,23,42,.07);border-radius:26px;background:#fff}.section-heading h2{margin:.35rem 0 1.3rem;font-size:clamp(1.55rem,3vw,2.2rem);letter-spacing:-.035em}
+  .spec-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem}.spec-grid div{padding:1rem;border-radius:16px;background:#f3f4f6}.spec-grid dt{color:#64748b;font-size:.72rem}.spec-grid dd{margin-top:.2rem;color:#111827;font-weight:800}
+  .features{margin-top:1.75rem;padding-top:1.5rem;border-top:1px solid #e5e7eb}.features h3{margin-bottom:1rem;font-size:1rem}.features ul{display:grid;grid-template-columns:repeat(2,1fr);gap:.65rem;list-style:none}.features li{display:flex;gap:.55rem;color:#475569;font-size:.9rem}.features li span{color:#dc2626;font-weight:900}
+  .booking-card{position:sticky;top:1.2rem;margin-top:-3rem;overflow:hidden;border:1px solid rgba(15,23,42,.08);border-radius:28px;background:#fff;box-shadow:0 26px 65px rgba(15,23,42,.13)}.booking-card__header{padding:1.5rem 1.5rem 1.2rem;border-bottom:1px solid #edf0f3}.booking-card__header h2{margin:.35rem 0 .5rem;font-size:1.7rem;letter-spacing:-.035em}.booking-card__header p{color:#64748b;font-size:.86rem;line-height:1.55}
+  .booking-card form{display:grid;gap:.9rem;padding:1.5rem}.booking-card label{display:grid;gap:.38rem;color:#374151;font-size:.75rem;font-weight:800}.booking-card label span{color:#94a3b8;font-weight:500}.booking-card input,.booking-card textarea{width:100%;min-width:0;border:1px solid #d7dce3;border-radius:12px;padding:.78rem .8rem;background:#fff;color:#111827;font:inherit;font-size:.86rem;outline:none}.booking-card input:focus,.booking-card textarea:focus{border-color:#dc2626;box-shadow:0 0 0 3px rgba(220,38,38,.1)}.booking-card textarea{resize:vertical}.form-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}
+  .estimate{padding:.75rem;border-radius:12px;background:#fff7ed;color:#9a3412;font-size:.82rem;font-weight:700}.booking-card button{min-height:49px;border:0;border-radius:13px;padding:.85rem 1rem;background:#dc2626;color:#fff;font:inherit;font-size:.88rem;font-weight:850;cursor:pointer;box-shadow:0 10px 24px rgba(220,38,38,.22)}.booking-card button:disabled{cursor:not-allowed;background:#94a3b8;box-shadow:none}.form-message{color:#475569;font-size:.82rem;overflow-wrap:anywhere}.form-message.is-success,.form-message.is-error{padding:.75rem;border-radius:12px}.form-message.is-success{background:#ecfdf5;color:#166534}.form-message.is-error{background:#fef2f2;color:#991b1b}.form-message a{color:inherit;font-weight:800}.booking-note{color:#94a3b8;text-align:center;font-size:.7rem}
+  @media(max-width:960px){.detail-layout{grid-template-columns:1fr}.booking-card{position:static;margin-top:0}}
+  @media(max-width:700px){.detail-shell{width:min(100% - 1.25rem,1180px)}.detail-hero{padding:1.4rem 0 4.5rem}.detail-heading{grid-template-columns:1fr;gap:1.4rem;margin-top:2.4rem}.detail-heading h1{font-size:clamp(2.5rem,14vw,4rem)}.price-block{min-width:0}.detail-left{margin-top:-2.5rem}.gallery{padding:.45rem;border-radius:20px}.gallery__main{aspect-ratio:4/3;border-radius:16px}.availability,.photo-count{top:.65rem;padding:.4rem .58rem;font-size:.65rem}.availability{left:.65rem}.photo-count{right:.65rem}.spec-grid,.features ul,.form-row{grid-template-columns:1fr 1fr}.vehicle-details,.booking-card{border-radius:20px}}
+  @media(max-width:440px){.spec-grid,.features ul,.form-row{grid-template-columns:1fr}.booking-card__header,.booking-card form{padding:1.15rem}}
+</style>

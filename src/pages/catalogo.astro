@@ -1,345 +1,315 @@
 ---
 import MainLayout from '../layouts/MainLayout.astro';
-import { getRentals } from '../lib/data.js';
+import {
+  categoryLabel,
+  fuelLabel,
+  getRentals,
+  rentalSlug,
+  transmissionLabel
+} from '../lib/data.js';
 
-const allCars = await getRentals();
+const rentals = (await getRentals()).map((car) => ({ ...car, slug: rentalSlug(car) }));
 const searchQuery = String(Astro.url.searchParams.get('search') || '').trim().toLowerCase();
 const cars = searchQuery
-  ? allCars.filter((car) => `${car.brand} ${car.model} ${car.year} ${car.category}`.toLowerCase().includes(searchQuery))
-  : allCars;
+  ? rentals.filter((car) => `${car.brand} ${car.model} ${car.year} ${car.category}`.toLowerCase().includes(searchQuery))
+  : rentals;
+const availableCount = rentals.filter((car) => car.available).length;
+const minimumPrice = rentals.length ? Math.min(...rentals.map((car) => car.price_per_day)) : 0;
 ---
 
-<MainLayout title="Catalogo - Alex Renta Cars">
-  <section class="catalog">
-    <div class="catalog__container">
-      <div class="catalog__header">
-        <h1 class="catalog__title">Nuestra flota disponible</h1>
-        <p class="catalog__subtitle">
-          Los vehiculos de esta pagina salen del admin para que puedas publicar, editar o quitar
-          unidades sin tocar codigo.
+<MainLayout
+  title="Alquiler de vehículos en El Salvador | Alex Renta Cars"
+  description="Consulta la flota, tarifas diarias y disponibilidad de Alex Renta Cars. Envía tu solicitud de reserva en línea."
+>
+  <section class="catalog-hero">
+    <div class="catalog-shell catalog-hero__layout">
+      <div>
+        <span class="catalog-eyebrow">Flota para alquiler</span>
+        <h1>Un vehículo para cada ruta.</h1>
+        <p>
+          Compara capacidad, transmisión y tarifa diaria. La disponibilidad publicada se mantiene
+          sincronizada con nuestro panel de operación.
         </p>
+      </div>
+      <dl class="catalog-hero__stats" aria-label="Resumen de flota">
+        <div><dt>Flota publicada</dt><dd>{rentals.length}</dd></div>
+        <div><dt>Disponibles</dt><dd>{availableCount}</dd></div>
+        <div><dt>Tarifas desde</dt><dd>${minimumPrice}<small>/día</small></dd></div>
+      </dl>
+    </div>
+  </section>
 
-        <button class="catalog__filters-toggle" id="filters-toggle" type="button">
-          Mostrar filtros
+  <section class="catalog-main">
+    <div class="catalog-shell">
+      <div class="catalog-toolbar">
+        <div class="catalog-toolbar__heading">
+          <span class="catalog-eyebrow">Explora la flota</span>
+          <h2>Encuentra tu próxima renta</h2>
+        </div>
+
+        <button class="catalog-filter-toggle" id="filters-toggle" type="button" aria-expanded="false" aria-controls="filters-container">
+          Filtrar vehículos
         </button>
 
-        <div class="catalog__filters" id="filters-container">
-          <div class="filter-group">
-            <label for="category" class="filter-label">Categoria</label>
-            <select id="category" class="filter-select">
+        <div class="catalog-filters" id="filters-container">
+          <label>
+            Buscar
+            <input id="catalog-search" type="search" value={searchQuery} placeholder="Marca, modelo o año" />
+          </label>
+          <label>
+            Categoría
+            <select id="category">
               <option value="">Todas</option>
-              <option value="sedan">Sedan</option>
+              <option value="sedan">Sedán</option>
               <option value="suv">SUV</option>
               <option value="compacto">Compacto</option>
               <option value="deportivo">Deportivo</option>
               <option value="van">Van</option>
               <option value="pickup">Pickup</option>
             </select>
-          </div>
-          <div class="filter-group">
-            <label for="transmission" class="filter-label">Transmision</label>
-            <select id="transmission" class="filter-select">
+          </label>
+          <label>
+            Transmisión
+            <select id="transmission">
               <option value="">Cualquiera</option>
-              <option value="automatica">Automatica</option>
+              <option value="automatica">Automática</option>
               <option value="manual">Manual</option>
             </select>
-          </div>
-          <div class="filter-group">
-            <label for="price" class="filter-label">Precio maximo</label>
-            <select id="price" class="filter-select">
-              <option value="">Sin limite</option>
-              <option value="35">Hasta $35/dia</option>
-              <option value="50">Hasta $50/dia</option>
-              <option value="70">Hasta $70/dia</option>
-              <option value="100">Hasta $100/dia</option>
+          </label>
+          <label>
+            Tarifa máxima
+            <select id="price">
+              <option value="">Sin límite</option>
+              <option value="35">$35 por día</option>
+              <option value="50">$50 por día</option>
+              <option value="70">$70 por día</option>
+              <option value="100">$100 por día</option>
             </select>
-          </div>
-          <button class="filters-apply" id="apply-filters" type="button">Aplicar</button>
+          </label>
+          <label class="catalog-check">
+            <input id="available" type="checkbox" />
+            Solo disponibles
+          </label>
+          <button id="clear-filters" class="catalog-clear" type="button">Limpiar</button>
         </div>
       </div>
 
-      <div class="catalog__grid" id="catalog-grid">
+      <div class="catalog-results">
+        <p id="result-count" aria-live="polite">{cars.length} {cars.length === 1 ? 'vehículo' : 'vehículos'}</p>
+        <span>Selecciona uno para revisar fotos, detalles y fechas.</span>
+      </div>
+
+      <div class="catalog-grid" id="catalog-grid">
         {cars.map((car) => (
-          <a href={`/catalogo/${car.id}`} class="catalog-card">
-            <div class="catalog-card__image">
-              <img src={car.images[0] || '/img/toyota-corolla-2023-1.jpg'} alt={`${car.brand} ${car.model}`} />
-              {!car.available && <span>No disponible</span>}
-            </div>
-            <div class="catalog-card__content">
-              <div class="catalog-card__top">
+          <article class="vehicle-card">
+            <a href={`/catalogo/${car.slug}`} class="vehicle-card__image-link" aria-label={`Ver ${car.brand} ${car.model} ${car.year}`}>
+              <img src={car.images[0] || '/img/toyota-corolla-2023-1.jpg'} alt={`${car.brand} ${car.model} ${car.year}`} loading="lazy" />
+              <span class={`vehicle-card__status ${car.available ? 'is-available' : 'is-unavailable'}`}>
+                {car.available ? 'Disponible' : car.status}
+              </span>
+              {car.images.length > 1 && <span class="vehicle-card__photos">{car.images.length} fotos</span>}
+            </a>
+            <div class="vehicle-card__body">
+              <div class="vehicle-card__title">
                 <div>
-                  <h2>{car.brand} {car.model}</h2>
-                  <p>{car.year} · {car.category}</p>
+                  <p>{categoryLabel(car.category)} · {car.year}</p>
+                  <h3><a href={`/catalogo/${car.slug}`}>{car.brand} {car.model}</a></h3>
                 </div>
-                <strong>${car.price_per_day}<small>/dia</small></strong>
+                <strong>${car.price_per_day}<small>/día</small></strong>
               </div>
-              <div class="catalog-card__specs">
-                <span>{car.transmission}</span>
-                <span>{car.seats} asientos</span>
-                <span>{car.fuel_type}</span>
+              <div class="vehicle-card__specs">
+                <span>{transmissionLabel(car.transmission)}</span>
+                <span>{car.seats} pasajeros</span>
+                <span>{fuelLabel(car.fuel_type)}</span>
               </div>
-              <p class="catalog-card__description">{car.description}</p>
+              <p class="vehicle-card__description">{car.description}</p>
+              <a href={`/catalogo/${car.slug}`} class="vehicle-card__cta">
+                Ver vehículo <span aria-hidden="true">→</span>
+              </a>
             </div>
-          </a>
+          </article>
         ))}
       </div>
-      {cars.length === 0 && <p class="catalog__empty">No encontramos vehículos con ese criterio.</p>}
+
+      <div class="catalog-empty" id="catalog-empty" hidden>
+        <strong>No hay vehículos con esos filtros.</strong>
+        <p>Prueba otra categoría o elimina el límite de tarifa.</p>
+      </div>
     </div>
   </section>
 
   <script is:inline define:vars={{ cars }}>
-    // @ts-nocheck -- Datos serializados por Astro para filtros del navegador.
+    // @ts-nocheck -- Datos serializados por Astro para filtros en el navegador.
     const source = [...cars];
     const grid = document.getElementById('catalog-grid');
+    const resultCount = document.getElementById('result-count');
+    const empty = document.getElementById('catalog-empty');
+    const search = document.getElementById('catalog-search');
     const category = document.getElementById('category');
     const transmission = document.getElementById('transmission');
     const price = document.getElementById('price');
-    const filtersContainer = document.getElementById('filters-container');
-    const filtersToggle = document.getElementById('filters-toggle');
-    const applyButton = document.getElementById('apply-filters');
+    const available = document.getElementById('available');
+    const filters = document.getElementById('filters-container');
+    const toggle = document.getElementById('filters-toggle');
+    const clear = document.getElementById('clear-filters');
 
+    const categoryLabels = { sedan: 'Sedán', suv: 'SUV', compacto: 'Compacto', deportivo: 'Deportivo', van: 'Van', pickup: 'Pickup' };
+    const transmissionLabels = { automatica: 'Automática', manual: 'Manual' };
+    const fuelLabels = { gasolina: 'Gasolina', diesel: 'Diésel', electrico: 'Eléctrico', hibrido: 'Híbrido' };
     const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
     })[character]);
-
     const safeImageUrl = (value) => {
       const candidate = String(value || '');
       if (candidate.startsWith('/')) return escapeHtml(candidate);
       try {
         const parsed = new URL(candidate);
-        return ['http:', 'https:'].includes(parsed.protocol)
-          ? escapeHtml(parsed.href)
-          : '/img/toyota-corolla-2023-1.jpg';
+        return ['http:', 'https:'].includes(parsed.protocol) ? escapeHtml(parsed.href) : '/img/toyota-corolla-2023-1.jpg';
       } catch {
         return '/img/toyota-corolla-2023-1.jpg';
       }
     };
 
-    function render(items) {
-      grid.innerHTML = items.map((car) => `
-        <a href="/catalogo/${encodeURIComponent(car.id)}" class="catalog-card">
-          <div class="catalog-card__image">
-            <img src="${safeImageUrl(car.images?.[0])}" alt="${escapeHtml(car.brand)} ${escapeHtml(car.model)}" />
-            ${car.available ? '' : '<span>No disponible</span>'}
-          </div>
-          <div class="catalog-card__content">
-            <div class="catalog-card__top">
-              <div>
-                <h2>${escapeHtml(car.brand)} ${escapeHtml(car.model)}</h2>
-                <p>${escapeHtml(car.year)} · ${escapeHtml(car.category)}</p>
-              </div>
-              <strong>$${escapeHtml(car.price_per_day)}<small>/dia</small></strong>
+    function card(item) {
+      const statusClass = item.available ? 'is-available' : 'is-unavailable';
+      const status = item.available ? 'Disponible' : item.status;
+      const photoCount = item.images?.length > 1 ? `<span class="vehicle-card__photos">${item.images.length} fotos</span>` : '';
+      return `
+        <article class="vehicle-card">
+          <a href="/catalogo/${encodeURIComponent(item.slug)}" class="vehicle-card__image-link" aria-label="Ver ${escapeHtml(item.brand)} ${escapeHtml(item.model)} ${escapeHtml(item.year)}">
+            <img src="${safeImageUrl(item.images?.[0])}" alt="${escapeHtml(item.brand)} ${escapeHtml(item.model)} ${escapeHtml(item.year)}" loading="lazy" />
+            <span class="vehicle-card__status ${statusClass}">${escapeHtml(status)}</span>
+            ${photoCount}
+          </a>
+          <div class="vehicle-card__body">
+            <div class="vehicle-card__title">
+              <div><p>${escapeHtml(categoryLabels[item.category] || item.category)} · ${escapeHtml(item.year)}</p><h3><a href="/catalogo/${encodeURIComponent(item.slug)}">${escapeHtml(item.brand)} ${escapeHtml(item.model)}</a></h3></div>
+              <strong>$${escapeHtml(item.price_per_day)}<small>/día</small></strong>
             </div>
-            <div class="catalog-card__specs">
-              <span>${escapeHtml(car.transmission)}</span>
-              <span>${escapeHtml(car.seats)} asientos</span>
-              <span>${escapeHtml(car.fuel_type)}</span>
-            </div>
-            <p class="catalog-card__description">${escapeHtml(car.description || '')}</p>
+            <div class="vehicle-card__specs"><span>${escapeHtml(transmissionLabels[item.transmission] || item.transmission)}</span><span>${escapeHtml(item.seats)} pasajeros</span><span>${escapeHtml(fuelLabels[item.fuel_type] || item.fuel_type)}</span></div>
+            <p class="vehicle-card__description">${escapeHtml(item.description || '')}</p>
+            <a href="/catalogo/${encodeURIComponent(item.slug)}" class="vehicle-card__cta">Ver vehículo <span aria-hidden="true">→</span></a>
           </div>
-        </a>
-      `).join('');
+        </article>`;
     }
 
     function applyFilters() {
+      const query = String(search.value || '').trim().toLowerCase();
       const items = source.filter((car) => {
-        const byCategory = !category.value || car.category === category.value;
-        const byTransmission = !transmission.value || car.transmission === transmission.value;
-        const byPrice = !price.value || Number(car.price_per_day) <= Number(price.value);
-        return byCategory && byTransmission && byPrice;
+        const searchable = `${car.brand} ${car.model} ${car.year} ${car.category}`.toLowerCase();
+        return (!query || searchable.includes(query))
+          && (!category.value || car.category === category.value)
+          && (!transmission.value || car.transmission === transmission.value)
+          && (!price.value || Number(car.price_per_day) <= Number(price.value))
+          && (!available.checked || car.available);
       });
-      render(items);
+      grid.innerHTML = items.map(card).join('');
+      resultCount.textContent = `${items.length} ${items.length === 1 ? 'vehículo' : 'vehículos'}`;
+      empty.hidden = items.length > 0;
     }
 
-    filtersToggle?.addEventListener('click', () => {
-      filtersContainer?.classList.toggle('is-open');
+    [search, category, transmission, price, available].forEach((control) => {
+      control?.addEventListener(control === search ? 'input' : 'change', applyFilters);
     });
 
-    applyButton?.addEventListener('click', applyFilters);
+    clear?.addEventListener('click', () => {
+      search.value = '';
+      category.value = '';
+      transmission.value = '';
+      price.value = '';
+      available.checked = false;
+      applyFilters();
+    });
+
+    toggle?.addEventListener('click', () => {
+      const open = filters.classList.toggle('is-open');
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.textContent = open ? 'Ocultar filtros' : 'Filtrar vehículos';
+    });
   </script>
 </MainLayout>
 
 <style>
-  .catalog {
-    padding: 3rem 0 4rem;
-    min-height: 80vh;
+  .catalog-shell { width: min(1180px, calc(100% - 2.5rem)); margin-inline: auto; }
+  .catalog-eyebrow { display: block; color: #e02d2d; font-size: .75rem; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; }
+  .catalog-hero { position: relative; overflow: hidden; padding: clamp(4rem, 8vw, 7rem) 0 6rem; color: #fff; background: radial-gradient(circle at 80% 10%, rgba(224,45,45,.34), transparent 32%), linear-gradient(135deg, #111827 0%, #18202f 62%, #361519 100%); }
+  .catalog-hero::after { content: ''; position: absolute; inset: auto -8% -55% 35%; height: 480px; border: 1px solid rgba(255,255,255,.08); border-radius: 50%; transform: rotate(-8deg); }
+  .catalog-hero__layout { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr); gap: 4rem; align-items: end; }
+  .catalog-hero .catalog-eyebrow { color: #ff9a7b; }
+  .catalog-hero h1 { max-width: 720px; margin: .65rem 0 1rem; font-size: clamp(2.8rem, 7vw, 5.7rem); line-height: .96; letter-spacing: -.055em; }
+  .catalog-hero p { max-width: 620px; color: #cbd5e1; font-size: clamp(1rem, 2vw, 1.15rem); }
+  .catalog-hero__stats { display: grid; grid-template-columns: repeat(3, 1fr); overflow: hidden; border: 1px solid rgba(255,255,255,.12); border-radius: 22px; background: rgba(255,255,255,.06); backdrop-filter: blur(12px); }
+  .catalog-hero__stats div { padding: 1.2rem; border-right: 1px solid rgba(255,255,255,.1); }
+  .catalog-hero__stats div:last-child { border: 0; }
+  .catalog-hero__stats dt { color: #94a3b8; font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; }
+  .catalog-hero__stats dd { margin: .35rem 0 0; font-size: 1.65rem; font-weight: 800; }
+  .catalog-hero__stats small { margin-left: .15rem; font-size: .72rem; color: #cbd5e1; }
+
+  .catalog-main { min-height: 70vh; padding: 0 0 5rem; background: #f5f3f0; }
+  .catalog-toolbar { position: relative; z-index: 2; display: grid; grid-template-columns: .85fr 2.15fr; gap: 2rem; align-items: end; margin-top: -3.2rem; padding: 1.35rem; border: 1px solid rgba(15,23,42,.08); border-radius: 26px; background: rgba(255,255,255,.96); box-shadow: 0 28px 70px rgba(15,23,42,.13); }
+  .catalog-toolbar__heading h2 { margin: .3rem 0 0; font-size: clamp(1.5rem, 3vw, 2rem); letter-spacing: -.03em; }
+  .catalog-filters { display: grid; grid-template-columns: 1.35fr repeat(3, 1fr) auto auto; gap: .7rem; align-items: end; }
+  .catalog-filters label { display: grid; gap: .35rem; color: #64748b; font-size: .72rem; font-weight: 700; }
+  .catalog-filters input[type='search'], .catalog-filters select { width: 100%; min-width: 0; border: 1px solid #d7dce3; border-radius: 13px; padding: .8rem .85rem; background: #fff; color: #111827; font: inherit; font-size: .86rem; }
+  .catalog-check { display: flex !important; align-items: center; min-height: 43px; gap: .45rem !important; white-space: nowrap; color: #374151 !important; }
+  .catalog-check input { accent-color: #dc2626; }
+  .catalog-clear, .catalog-filter-toggle { min-height: 43px; border: 0; border-radius: 13px; padding: .75rem .9rem; background: #111827; color: #fff; font: inherit; font-size: .82rem; font-weight: 800; cursor: pointer; }
+  .catalog-filter-toggle { display: none; }
+  .catalog-results { display: flex; justify-content: space-between; gap: 1rem; margin: 2.5rem 0 1rem; color: #64748b; font-size: .9rem; }
+  .catalog-results p { color: #111827; font-weight: 800; }
+  .catalog-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
+
+  .vehicle-card { min-width: 0; overflow: hidden; border: 1px solid rgba(15,23,42,.07); border-radius: 25px; background: #fff; box-shadow: 0 12px 35px rgba(15,23,42,.07); transition: transform .25s ease, box-shadow .25s ease; }
+  .vehicle-card:hover { transform: translateY(-5px); box-shadow: 0 24px 50px rgba(15,23,42,.12); }
+  .vehicle-card__image-link { position: relative; display: block; aspect-ratio: 16 / 10; overflow: hidden; background: #e5e7eb; }
+  .vehicle-card__image-link img { width: 100%; height: 100%; object-fit: cover; transition: transform .45s ease; }
+  .vehicle-card:hover .vehicle-card__image-link img { transform: scale(1.035); }
+  .vehicle-card__status, .vehicle-card__photos { position: absolute; top: .85rem; border-radius: 999px; padding: .42rem .68rem; color: #fff; font-size: .72rem; font-weight: 800; backdrop-filter: blur(8px); }
+  .vehicle-card__status { left: .85rem; }
+  .vehicle-card__status.is-available { background: rgba(21,128,61,.9); }
+  .vehicle-card__status.is-unavailable { background: rgba(15,23,42,.86); }
+  .vehicle-card__photos { right: .85rem; background: rgba(15,23,42,.72); }
+  .vehicle-card__body { display: grid; gap: .9rem; padding: 1.2rem; }
+  .vehicle-card__title { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+  .vehicle-card__title p { color: #e02d2d; font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+  .vehicle-card__title h3 { margin-top: .18rem; font-size: 1.35rem; letter-spacing: -.025em; }
+  .vehicle-card__title h3 a { color: #111827; text-decoration: none; }
+  .vehicle-card__title strong { color: #111827; font-size: 1.35rem; line-height: 1; white-space: nowrap; }
+  .vehicle-card__title small { display: block; margin-top: .2rem; color: #64748b; font-size: .7rem; font-weight: 600; text-align: right; }
+  .vehicle-card__specs { display: flex; flex-wrap: wrap; gap: .45rem; }
+  .vehicle-card__specs span { border-radius: 999px; padding: .42rem .65rem; background: #f1f3f5; color: #475569; font-size: .76rem; font-weight: 650; }
+  .vehicle-card__description { display: -webkit-box; overflow: hidden; min-height: 3em; color: #64748b; font-size: .9rem; line-height: 1.55; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .vehicle-card__cta { display: flex; justify-content: space-between; align-items: center; padding-top: .9rem; border-top: 1px solid #edf0f3; color: #111827; text-decoration: none; font-size: .86rem; font-weight: 800; }
+  .vehicle-card__cta span { color: #dc2626; font-size: 1.15rem; }
+  .catalog-empty { padding: 4rem 1rem; border: 1px dashed #cbd5e1; border-radius: 24px; text-align: center; color: #64748b; }
+  .catalog-empty strong { display: block; color: #111827; font-size: 1.2rem; }
+
+  @media (max-width: 1080px) {
+    .catalog-hero__layout { grid-template-columns: 1fr; gap: 2rem; }
+    .catalog-hero__stats { max-width: 680px; }
+    .catalog-toolbar { grid-template-columns: 1fr; }
+    .catalog-filters { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .catalog-check, .catalog-clear { grid-column: span 2; }
   }
-
-  .catalog__container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1.25rem;
+  @media (max-width: 820px) {
+    .catalog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .catalog-hero { padding-top: 3.5rem; }
   }
-
-  .catalog__header {
-    text-align: center;
-    margin-bottom: 2rem;
-  }
-
-  .catalog__title {
-    font-size: clamp(2rem, 5vw, 3.5rem);
-    margin-bottom: 0.9rem;
-  }
-
-  .catalog__subtitle {
-    max-width: 700px;
-    margin: 0 auto 1.4rem;
-    color: #6b7280;
-  }
-
-  .catalog__filters-toggle {
-    display: none;
-    border: 0;
-    border-radius: 999px;
-    background: #111827;
-    color: #fff;
-    padding: 0.9rem 1.1rem;
-    font: inherit;
-    font-weight: 700;
-  }
-
-  .catalog__filters {
-    display: flex;
-    justify-content: center;
-    gap: 0.85rem;
-    flex-wrap: wrap;
-  }
-
-  .filter-group {
-    display: grid;
-    gap: 0.45rem;
-    text-align: left;
-  }
-
-  .filter-label {
-    font-size: 0.85rem;
-    color: #374151;
-  }
-
-  .filter-select,
-  .filters-apply {
-    border: 1px solid #d1d5db;
-    border-radius: 16px;
-    padding: 0.85rem 1rem;
-    background: #fff;
-    font: inherit;
-  }
-
-  .filters-apply {
-    border: 0;
-    background: linear-gradient(135deg, #dc2626, #f97316);
-    color: #fff;
-    align-self: end;
-    cursor: pointer;
-    font-weight: 700;
-  }
-
-  .catalog__grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
-  }
-
-  .catalog-card {
-    display: block;
-    background: #fff;
-    border-radius: 28px;
-    overflow: hidden;
-    box-shadow: 0 20px 55px rgba(15, 23, 42, 0.09);
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .catalog-card__image {
-    position: relative;
-    height: 220px;
-  }
-
-  .catalog-card__image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .catalog-card__image span {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    border-radius: 999px;
-    background: rgba(17, 24, 39, 0.85);
-    color: #fff;
-    font-size: 0.78rem;
-    padding: 0.45rem 0.7rem;
-  }
-
-  .catalog-card__content {
-    padding: 1.2rem;
-    display: grid;
-    gap: 0.8rem;
-  }
-
-  .catalog-card__top {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-  }
-
-  .catalog-card__top p,
-  .catalog-card__description {
-    color: #6b7280;
-  }
-
-  .catalog-card__top strong {
-    color: #dc2626;
-    font-size: 1.4rem;
-  }
-
-  .catalog-card__top small {
-    font-size: 0.78rem;
-    color: #9ca3af;
-    display: block;
-    text-align: right;
-  }
-
-  .catalog-card__specs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.55rem;
-  }
-
-  .catalog-card__specs span {
-    background: #f3f4f6;
-    padding: 0.45rem 0.75rem;
-    border-radius: 999px;
-    font-size: 0.82rem;
-  }
-
-  @media (max-width: 900px) {
-    .catalog__grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  @media (max-width: 768px) {
-    .catalog__filters-toggle {
-      display: inline-flex;
-      margin-bottom: 1rem;
-    }
-
-    .catalog__filters {
-      display: none;
-      background: #fff;
-      padding: 1rem;
-      border-radius: 20px;
-      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
-    }
-
-    .catalog__filters.is-open {
-      display: grid;
-    }
-
-    .catalog__grid {
-      grid-template-columns: 1fr;
-    }
+  @media (max-width: 640px) {
+    .catalog-shell { width: min(100% - 1.25rem, 1180px); }
+    .catalog-hero { padding: 3.25rem 0 4.8rem; }
+    .catalog-hero h1 { font-size: clamp(2.55rem, 14vw, 4rem); }
+    .catalog-hero__stats { grid-template-columns: 1fr; }
+    .catalog-hero__stats div { display: flex; justify-content: space-between; align-items: center; padding: .85rem 1rem; border-right: 0; border-bottom: 1px solid rgba(255,255,255,.1); }
+    .catalog-hero__stats dd { margin: 0; font-size: 1.25rem; }
+    .catalog-toolbar { margin-top: -2rem; padding: 1rem; border-radius: 20px; }
+    .catalog-toolbar { display: block; }
+    .catalog-filter-toggle { display: flex; width: 100%; justify-content: center; margin-top: 1rem; }
+    .catalog-filters { display: none; grid-template-columns: 1fr; margin-top: 1rem; }
+    .catalog-filters.is-open { display: grid; }
+    .catalog-check, .catalog-clear { grid-column: auto; }
+    .catalog-results { display: grid; margin-top: 1.8rem; }
+    .catalog-results span { font-size: .82rem; }
+    .catalog-grid { grid-template-columns: 1fr; }
   }
 </style>

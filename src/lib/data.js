@@ -316,7 +316,16 @@ export async function getRentals() {
 
 export async function getRentalById(id) {
   const rentals = await getRentals();
-  return rentals.find((item) => item.id === id) || null;
+  return rentals.find((item) => item.id === id || rentalSlug(item) === id) || null;
+}
+
+export function rentalSlug(rental) {
+  return `${rental?.brand || ''}-${rental?.model || ''}-${rental?.year || ''}`
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'vehiculo';
 }
 
 export async function getFeaturedRentals(limit = 3) {

@@ -9,7 +9,7 @@ const contactInfo = [
   {
     icon: "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
     title: "Email",
-    details: ["info@alexrentacars.com", "soporte@alexrentacars.com"],
+    details: ["info@alexrentacars.com"],
     link: "mailto:info@alexrentacars.com"
   },
   {
@@ -36,19 +36,19 @@ const contactInfo = [
 const faqs = [
   {
     question: "¿Cuáles son los requisitos para rentar un vehículo?",
-    answer: "Necesitas tener licencia de conducir vigente, identificación oficial, ser mayor de 21 años y contar con una tarjeta de crédito para el depósito de garantía."
+    answer: "Los requisitos pueden variar según el vehículo y las fechas. Envíanos tu solicitud y te confirmaremos la documentación necesaria antes de reservar."
   },
   {
     question: "¿Qué incluye el precio de la renta?",
-    answer: "El precio incluye seguro básico, kilometraje ilimitado, asistencia en carretera 24/7 y mantenimiento preventivo. No incluye gasolina ni peajes."
+    answer: "La ficha muestra una tarifa diaria de referencia. Nuestro equipo confirma contigo la cobertura, condiciones y cualquier cargo aplicable antes de completar la reserva."
   },
   {
     question: "¿Puedo modificar o cancelar mi reserva?",
-    answer: "Sí, puedes modificar o cancelar tu reserva sin costo hasta 24 horas antes de la fecha de recogida. Después de ese tiempo aplican cargos por cancelación."
+    answer: "Contáctanos con tu código de solicitud para revisar cualquier cambio. Las condiciones se confirman al coordinar la reserva."
   },
   {
     question: "¿Ofrecen servicio de entrega y recogida?",
-    answer: "Sí, ofrecemos servicio de entrega y recogida en el aeropuerto y hoteles del área metropolitana de San Salvador sin costo adicional."
+    answer: "Indica el lugar que necesitas en tu solicitud. Te confirmaremos disponibilidad, horario y condiciones del servicio."
   }
 ];
 ---
@@ -123,7 +123,7 @@ const faqs = [
         <div class="contact-form-container">
           <div class="form-header">
             <h2>Envíanos un mensaje</h2>
-            <p>Completa el formulario y te contactaremos en menos de 24 horas</p>
+            <p>Completa el formulario y nuestro equipo revisará tu consulta.</p>
           </div>
 
           <form id="contactForm" class="contact-form">
@@ -159,7 +159,7 @@ const faqs = [
                   name="phone" 
                   class="form-input" 
                   required
-                  placeholder="+503 1234-5678"
+                  placeholder="Tu número con código de país"
                 />
               </div>
             </div>
@@ -169,8 +169,8 @@ const faqs = [
               <select id="subject" name="subject" class="form-select">
                 <option value="">Selecciona un asunto</option>
                 <option value="renta">Consulta sobre Renta</option>
+                <option value="importacion">Consulta sobre Importación</option>
                 <option value="cotizacion">Solicitud de Cotización</option>
-                <option value="soporte">Soporte Técnico</option>
                 <option value="general">Consulta General</option>
                 <option value="sugerencia">Sugerencia o Reclamo</option>
               </select>
@@ -253,7 +253,7 @@ const faqs = [
           +503 2275-8900
         </a>
       </div>
-      <p class="cta-note">Disponibles 24/7 para emergencias en carretera</p>
+      <p class="cta-note">También puedes escribirnos por WhatsApp al +503 7985-6321.</p>
     </div>
   </section>
 </MainLayout>
@@ -816,6 +816,12 @@ const faqs = [
     const contactForm = document.getElementById('contactForm');
     
     if (!contactForm) return;
+
+    const requestedSubject = new URLSearchParams(window.location.search).get('asunto');
+    const subjectSelect = document.getElementById('subject');
+    if (requestedSubject && [...subjectSelect.options].some(option => option.value === requestedSubject)) {
+      subjectSelect.value = requestedSubject;
+    }
 
     contactForm.addEventListener('submit', async function(e) {
       e.preventDefault();
