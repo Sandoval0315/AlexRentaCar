@@ -166,7 +166,7 @@ function normalizeImport(item) {
 
 function normalizeRentalRequest(item) {
   return {
-    id: item.id || crypto.randomUUID?.() || String(Date.now()),
+    id: item.id || '',
     request_code: item.request_code || '',
     rental_id: item.rental_id || '',
     customer_name: item.customer_name || '',
