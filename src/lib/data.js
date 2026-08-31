@@ -49,10 +49,10 @@ const fallbackRentals = [
     fuel_type: 'gasolina',
     features: ['Tercera Fila', 'Sistema de Sonido Premium', 'Control de Traccion'],
     images: ['/img/ford-explorer1.jpg'],
-    available: false,
+    available: true,
     featured: false,
     description: 'SUV familiar con capacidad para 7 pasajeros.',
-    status: 'Reservado',
+    status: 'Disponible',
     created_at: '2026-03-03T08:00:00.000Z'
   }
 ];
@@ -198,6 +198,12 @@ function normalizeContactMessage(item) {
 }
 
 function cleanRentalPayload(payload) {
+  const available = Boolean(payload.available);
+  const requestedStatus = String(payload.status || '').trim().slice(0, 60);
+  const unavailableStatus = !requestedStatus || ['disponible', 'reservado'].includes(requestedStatus.toLowerCase())
+    ? 'No disponible'
+    : requestedStatus;
+
   return {
     brand: String(payload.brand || '').trim().slice(0, 80),
     model: String(payload.model || '').trim().slice(0, 80),
@@ -209,10 +215,12 @@ function cleanRentalPayload(payload) {
     fuel_type: String(payload.fuel_type || 'gasolina').trim().slice(0, 40),
     features: Array.isArray(payload.features) ? payload.features.map((value) => String(value).trim().slice(0, 120)).filter(Boolean).slice(0, 30) : [],
     images: Array.isArray(payload.images) ? payload.images.map((value) => String(value).trim()).filter(Boolean).slice(0, 12) : [],
-    available: Boolean(payload.available),
+    available,
     featured: Boolean(payload.featured),
     description: String(payload.description || '').trim().slice(0, 3000),
-    status: String(payload.status || 'Disponible').trim().slice(0, 60)
+    // Las reservas se controlan por rango de fechas en rental_requests.
+    // Este estado solo representa si el vehículo está habilitado operativamente.
+    status: available ? 'Disponible' : unavailableStatus
   };
 }
 
